@@ -1,12 +1,14 @@
 dist: bionic
 language: go
 go:
-- 1.13.x
+  - 1.13.x
 git:
   depth: 1
 notifications:
   email: false
+before_install:
+  - openssl aes-256-cbc -K $encrypted_27cd47e7b0d6_key -iv $encrypted_27cd47e7b0d6_iv -in .env.enc -out .env -d
 before_script:
-- go vet ./...
+  - go vet ./...
 script:
-- go test ./internal/...
+  - go test ./internal/...
