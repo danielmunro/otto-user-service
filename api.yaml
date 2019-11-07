@@ -1,0 +1,317 @@
+openapi: "3.0.0"
+info:
+  title: Otto user service
+  version: 1.0
+paths:
+  /user:
+    get:
+      operationId: getUserV1
+      summary: Get a user
+      responses:
+        '200':
+          description: |-
+            200 response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    post:
+      operationId: createNewUser
+      summary: Create a new user
+      requestBody:
+        description: user to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUser"
+      responses:
+        '201':
+          description: |-
+            201 response
+  /session:
+    post:
+      operationId: createNewSesssion
+      summary: Create a new user session
+      requestBody:
+        description: session to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewSession"
+      responses:
+        '201':
+          description: |-
+            201 response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+    get:
+      operationId: getSession
+      summary: Get a session
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |-
+            200 response
+        '403':
+          description: |-
+            403 response
+    put:
+      operationId: respondToChallenge
+      summary: Respond to an authentication challenge
+      requestBody:
+        description: authentication to use in response
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewSession"
+      responses:
+        '200':
+          description: |-
+            200 response
+    patch:
+      operationId: updateUserSession
+      summary: Update a user's session
+      requestBody:
+        description: session to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionRefresh"
+      responses:
+        '200':
+          description: |-
+            200 response
+  /group:
+    get:
+      operationId: getGroupV1
+      summary: get a group
+      responses:
+        '200':
+          description: |-
+            200 response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+    post:
+      operationId: createGroupV1
+      summary: create a group
+      requestBody:
+        description: group to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewGroup"
+      responses:
+        '201':
+          description: |-
+            201 response
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - uuid
+        - name
+        - email
+        - birthday
+        - verified
+      properties:
+        id:
+          type: integer
+          format: int64
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        current_email:
+          type: string
+          format: email
+        current_password:
+          type: string
+        birthday:
+          type: string
+          format: birthday
+        verified:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Email'
+        passwords:
+          type: array
+          items:
+            $ref: '#/components/schemas/Password'
+    NewUser:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+       name:
+          type: string
+       email:
+         type: string
+         format: email
+       password:
+         type: string
+    Password:
+      type: object
+      required:
+        - password
+      properties:
+        id:
+          type: integer
+          format: int64
+        uuid:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/User'
+          type: object
+        password:
+          type: string
+        created:
+          type: string
+          format: date-time
+    Group:
+      type: object
+      required:
+        - id
+        - uuid
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        visibility:
+          type: enum
+          $ref: '#/components/schemas/Visibility'
+    NewGroup:
+      type: object
+      required:
+        - name
+        - visibility
+      properties:
+        name:
+          type: string
+        visibility:
+          type: enum
+          $ref: '#/components/schemas/Visibility'
+    Membership:
+      type: object
+      required:
+        - uuid
+        - created
+        - user
+        - group
+        - permission
+      properties:
+        id:
+          type: integer
+          format: int64
+        uuid:
+          type: string
+          format: uuid
+        created:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+          type: object
+        group:
+          $ref: '#/components/schemas/Group'
+          type: object
+        permission:
+          $ref: '#/components/schemas/Permission'
+          type: object
+    Visibility:
+      type: string
+      enum:
+        - public
+        - private
+    Permission:
+      type: string
+      enum:
+        - read
+        - write
+        - moderate
+        - admin
+    Email:
+      type: object
+      required:
+        - user
+        - email
+        - verifiedStatus
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+          type: object
+        email:
+          type: string
+        verifiedStatus:
+          $ref: '#/components/schemas/VerifiedStatus'
+          type: object
+    VerifiedStatus:
+      type: string
+      enum:
+        - unverified
+        - verified
+    Session:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+          type: object
+        token:
+          type: string
+    NewSession:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    SessionRefresh:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
