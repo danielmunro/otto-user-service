@@ -13,9 +13,7 @@ import (
 const dummyPassword = "foobar12345"
 
 func TestMain(m *testing.M) {
-	if os.Getenv("CI") == "" {
-		_ = godotenv.Load()
-	}
+	_ = godotenv.Load()
 	os.Exit(m.Run())
 }
 
