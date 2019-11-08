@@ -27,6 +27,13 @@ Start the Postgres database (`-d` runs it as a background process):
 docker-compose up -d
 ```
 
+Have AWS keys in a default credential chain.
+
+Run the migrations:
+```
+go run migrations/*.go
+```
+
 Run the server locally:
 ```
 go run main.go
