@@ -12,7 +12,6 @@ notifications:
   email: false
 before_script:
   - psql -c 'create database user_service;' -U postgres
-  - psql -c '\c user_service; create extension if not exists "uuid-ossp";' -U postgres
   - go vet ./...
   - go run migrations/*.go
 script:
