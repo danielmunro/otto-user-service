@@ -11,6 +11,7 @@ To run the server, follow these steps:
 Create an .env file:
 ```.env
 COGNITO_CLIENT_ID=
+COGNITO_CLIENT_SECRET= # if a secret is defined
 USER_POOL_ID=
 AWS_REGION=
 ```
