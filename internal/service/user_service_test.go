@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/joho/godotenv"
-	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -14,10 +13,7 @@ import (
 const dummyPassword = "foobar12345"
 
 func TestMain(m *testing.M) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load()
 	os.Exit(m.Run())
 }
 
