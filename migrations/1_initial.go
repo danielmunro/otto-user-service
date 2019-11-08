@@ -9,7 +9,6 @@ import (
 func main() {
 	_ = godotenv.Load()
 	conn := db.CreateDefaultConnection()
-	conn.Raw("create extension \"uuid-ossp\"")
 	conn.DropTableIfExists(&entity.User{})
 	conn.DropTableIfExists(&entity.Password{})
 	conn.DropTableIfExists(&entity.Email{})
