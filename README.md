@@ -14,6 +14,12 @@ COGNITO_CLIENT_ID=
 COGNITO_CLIENT_SECRET= # if a secret is defined
 USER_POOL_ID=
 AWS_REGION=
+
+PG_HOST=
+PG_USER=
+PG_PORT=
+PG_PASSWORD=
+PG_DBNAME=
 ```
 
 Start the Postgres database (`-d` runs it as a background process):
