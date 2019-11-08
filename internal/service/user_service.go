@@ -31,12 +31,7 @@ const AuthResponseChallenge = "NEW_PASSWORD_REQUIRED"
 const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
 
 func CreateDefaultUserService() *UserService {
-	return CreateUserService(repository.CreateUserRepository(db.GetConnection(
-		os.Getenv("PG_HOST"),
-		os.Getenv("PG_PORT"),
-		os.Getenv("PG_DBNAME"),
-		os.Getenv("PG_USER"),
-		os.Getenv("PG_PASSWORD"))))
+	return CreateUserService(repository.CreateUserRepository(db.CreateDefaultConnection()))
 }
 
 func CreateUserService(userRepository *repository.UserRepository) *UserService {
