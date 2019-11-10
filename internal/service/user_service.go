@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -12,6 +13,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/repository"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/segmentio/kafka-go"
 	"log"
 	"os"
 )
@@ -23,6 +25,7 @@ type UserService struct {
 	cognito             *cognitoidentityprovider.CognitoIdentityProvider
 	awsRegion           string
 	userRepository      *repository.UserRepository
+	kafkaWriter         *kafka.Writer
 }
 
 const AuthFlowAdminNoSRP = "ADMIN_NO_SRP_AUTH"
@@ -31,10 +34,16 @@ const AuthResponseChallenge = "NEW_PASSWORD_REQUIRED"
 const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
 
 func CreateDefaultUserService() *UserService {
-	return CreateUserService(repository.CreateUserRepository(db.CreateDefaultConnection()))
+	return CreateUserService(
+		repository.CreateUserRepository(db.CreateDefaultConnection()),
+		kafka.NewWriter(kafka.WriterConfig{
+			Brokers: []string{"localhost:9092"},
+			Topic: "users",
+			Balancer: &kafka.LeastBytes{},
+		}))
 }
 
-func CreateUserService(userRepository *repository.UserRepository) *UserService {
+func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *kafka.Writer) *UserService {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -46,6 +55,7 @@ func CreateUserService(userRepository *repository.UserRepository) *UserService {
 		cognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
 		awsRegion:           os.Getenv("AWS_REGION"),
 		userRepository:      userRepository,
+		kafkaWriter:         kafkaWriter,
 	}
 }
 
@@ -62,6 +72,9 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*entity.User, error) {
 
 	user := entity.CreateUser(newUser, *response.User.Username)
 	s.userRepository.Create(user)
+	_ = s.kafkaWriter.WriteMessages(
+		context.Background(),
+		kafka.Message{Value: user.ToJson()})
 	return user, nil
 }
 

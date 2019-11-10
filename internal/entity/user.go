@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"github.com/danielmunro/otto-user-service/internal/enum"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/google/uuid"
@@ -40,4 +41,9 @@ func CreateUser(newUser *model.NewUser, cognitoId string) *User {
 			CreateEmail(newUser.Email),
 		},
 	}
+}
+
+func (u *User) ToJson() []byte {
+	data, _ := json.Marshal(u)
+	return data
 }
