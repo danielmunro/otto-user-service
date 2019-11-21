@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	log.Print("Listening on 8080")
 	router := internal.NewRouter()
 	log.Fatal(http.ListenAndServe("localhost:8080", middleware.ContentTypeMiddleware(router)))
 }
