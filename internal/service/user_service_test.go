@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const dummyPassword = "foobar12345"
+const dummyPassword = "fOobar12345!"
 
 func TestMain(m *testing.M) {
 	if os.Getenv("CI") == "" {
@@ -32,6 +32,7 @@ func Test_CreateNewUser_SanityCheck(t *testing.T) {
 		Email:    GetEmailAddress(),
 		Password: dummyPassword,
 	})
+
 	if user == nil || user.ID < 1 {
 		t.Error("nil user")
 	}
@@ -81,7 +82,7 @@ func Test_AuthFlow_FromStart_ToVerifiedUser(t *testing.T) {
 	})
 	response := svc.ProvideChallengeResponse(&model.PasswordReset{
 		Email:    email,
-		Password: "my-awesome-new-password-123",
+		Password: "my-awesome-new-pAssword-123!",
 	})
 	if response == nil || response.AuthResponse != SessionAuthenticated {
 		t.Error("authflow")
