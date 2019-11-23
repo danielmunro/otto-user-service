@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+type ValidToken struct {
+	Valid bool
+}
+
 // CreateSessionV1 - Create a new session
 func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 	newSessionModel := model.DecodeRequestToNewSession(r)
@@ -20,10 +24,6 @@ func RespondToChallengeV1(w http.ResponseWriter, r *http.Request) {
 	passwordResetModel := model.DecodeRequestToPasswordReset(r)
 	result := service.CreateDefaultUserService().ProvideChallengeResponse(passwordResetModel)
 	_, _ = w.Write(result.ToJson())
-}
-
-type ValidToken struct {
-	Valid bool
 }
 
 // GetSessionV1 - validate a session token
