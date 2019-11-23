@@ -14,7 +14,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/segmentio/kafka-go"
-	"log"
 	"os"
 )
 
@@ -135,10 +134,10 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 	return createChallengeResponse(response)
 }
 
-func (s *UserService) ValidateSessionToken(sessionToken *model.SessionToken) bool {
+func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Session, error) {
 	keySet, jwkErr := jwk.Fetch(fmt.Sprintf(JwkTokenUrl, s.awsRegion, s.cognitoUserPool))
 	if jwkErr != nil {
-		return false
+		return nil, errors.New("jwk fetch error")
 	}
 
 	token, parseErr := jwt.Parse(sessionToken.Token, func(token *jwt.Token) (interface{}, error) {
@@ -150,28 +149,25 @@ func (s *UserService) ValidateSessionToken(sessionToken *model.SessionToken) boo
 		return nil, errors.New("no session found")
 	})
 	if parseErr != nil {
-		return false
+		return nil, parseErr
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
 	if err := claims.Valid(); err != nil || claims.VerifyAudience(s.cognitoClientID, false) == false {
-		log.Print(err)
-		return false
+		return nil, errors.New("verification failed")
 	}
 
 	response, err := s.cognito.GetUser(&cognitoidentityprovider.GetUserInput{ AccessToken: aws.String(sessionToken.Token) })
 	if err != nil {
-		log.Print(err)
-		return false
+		return nil, err
 	}
 
 	user := s.userRepository.GetUserFromSessionToken(sessionToken.Token)
-	if user == nil {
-		log.Print("user does not match jwt")
-		return false
+	if user == nil || user.CognitoId.String() != *response.Username {
+		return nil, errors.New("user does not match jwt")
 	}
 
-	return user.CognitoId.String() == *response.Username
+	return model.CreateSession(model.User{ Uuid: user.Uuid.String() }, sessionToken.Token), nil
 }
 
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {

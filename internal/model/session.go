@@ -14,3 +14,10 @@ type Session struct {
 	User  User `json:"user"`
 	Token string       `json:"token,omitempty"`
 }
+
+func CreateSession(user User, token string) *Session {
+	return &Session{
+		User:  user,
+		Token: token,
+	}
+}

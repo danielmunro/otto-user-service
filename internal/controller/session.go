@@ -7,10 +7,6 @@ import (
 	"net/http"
 )
 
-type ValidToken struct {
-	Valid bool
-}
-
 // CreateSessionV1 - Create a new session
 func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 	newSessionModel := model.DecodeRequestToNewSession(r)
@@ -29,14 +25,12 @@ func RespondToChallengeV1(w http.ResponseWriter, r *http.Request) {
 // GetSessionV1 - validate a session token
 func GetSessionV1(w http.ResponseWriter, r *http.Request) {
 	sessionToken := model.DecodeRequestToSessionToken(r)
-	valid := service.CreateDefaultUserService().ValidateSessionToken(sessionToken)
-	if valid {
-		w.WriteHeader(http.StatusOK)
-	} else {
+	session, err := service.CreateDefaultUserService().GetSession(sessionToken)
+	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
+		return
 	}
-	tok := &ValidToken{valid}
-	data, _ := json.Marshal(tok)
+	data, _ := json.Marshal(session)
 	_, _ = w.Write(data)
 }
 
