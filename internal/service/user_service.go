@@ -144,10 +144,12 @@ func (s *UserService) ValidateSessionToken(sessionToken *model.SessionToken) boo
 	token, parseErr := jwt.Parse(sessionToken.Token, func(token *jwt.Token) (interface{}, error) {
 		kid, _ := token.Header["kid"].(string)
 		keys := keySet.LookupKeyID(kid)
-		return keys[0].Materialize()
+		if len(keys) > 0 {
+			return keys[0].Materialize()
+		}
+		return nil, errors.New("no session found")
 	})
 	if parseErr != nil {
-		log.Print(parseErr)
 		return false
 	}
 
