@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/danielmunro/otto-user-service/internal/constants"
 	"github.com/danielmunro/otto-user-service/internal/db"
 	"github.com/danielmunro/otto-user-service/internal/entity"
 	"github.com/danielmunro/otto-user-service/internal/model"
@@ -37,7 +38,7 @@ func CreateDefaultUserService() *UserService {
 		repository.CreateUserRepository(db.CreateDefaultConnection()),
 		kafka.NewWriter(kafka.WriterConfig{
 			Brokers: []string{"localhost:9092"},
-			Topic: "users",
+			Topic: string(constants.Users),
 			Balancer: &kafka.LeastBytes{},
 		}))
 }
