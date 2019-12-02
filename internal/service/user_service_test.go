@@ -27,13 +27,13 @@ func GetEmailAddress() string {
 }
 
 func Test_CreateNewUser_SanityCheck(t *testing.T) {
-	user, _ := CreateDefaultUserService().CreateUser(&model.NewUser{
+	user, err := CreateDefaultUserService().CreateUser(&model.NewUser{
 		Name:     "foo",
 		Email:    GetEmailAddress(),
 		Password: dummyPassword,
 	})
 
-	if user == nil || user.ID < 1 {
+	if user == nil || err != nil {
 		t.Error("nil user")
 	}
 }
