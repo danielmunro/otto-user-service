@@ -10,6 +10,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/constants"
 	"github.com/danielmunro/otto-user-service/internal/db"
 	"github.com/danielmunro/otto-user-service/internal/entity"
+	"github.com/danielmunro/otto-user-service/internal/mapper"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/repository"
 	"github.com/dgrijalva/jwt-go"
@@ -59,7 +60,7 @@ func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *k
 	}
 }
 
-func (s *UserService) CreateUser(newUser *model.NewUser) (*entity.User, error) {
+func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	response, err := s.cognito.AdminCreateUser(&cognitoidentityprovider.AdminCreateUserInput{
 		Username:  aws.String(newUser.Email),
 		TemporaryPassword: aws.String(newUser.Password),
@@ -75,7 +76,7 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*entity.User, error) {
 	_ = s.kafkaWriter.WriteMessages(
 		context.Background(),
 		kafka.Message{Value: user.ToJson()})
-	return user, nil
+	return mapper.MapUserEntityToModel(user), nil
 }
 
 func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse {

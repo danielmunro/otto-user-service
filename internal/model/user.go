@@ -15,19 +15,19 @@ import (
 
 type User struct {
 
-	Id int64 `json:"id"`
+	Id int64 `json:"id,omitempty"`
 
 	Uuid string `json:"uuid"`
 
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 
 	CurrentEmail string `json:"current_email,omitempty"`
 
 	CurrentPassword string `json:"current_password,omitempty"`
 
-	Birthday string `json:"birthday"`
+	Birthday string `json:"birthday,omitempty"`
 
-	Verified bool `json:"verified"`
+	Verified bool `json:"verified,omitempty"`
 
 	Created time.Time `json:"created,omitempty"`
 

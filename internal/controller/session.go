@@ -12,7 +12,7 @@ func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 	newSessionModel := model.DecodeRequestToNewSession(r)
 	result := service.CreateDefaultUserService().CreateSession(newSessionModel)
 	if result.Token == nil {
-		w.WriteHeader(http.StatusForbidden)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
