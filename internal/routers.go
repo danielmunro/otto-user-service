@@ -86,7 +86,7 @@ var routes = Routes{
 	},
 
 	{
-		"CreateNewSesssion",
+		"CreateNewSession",
 		strings.ToUpper("Post"),
 		"/session",
 		controller.CreateSessionV1,

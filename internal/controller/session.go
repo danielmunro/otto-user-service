@@ -12,7 +12,7 @@ func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 	newSessionModel := model.DecodeRequestToNewSession(r)
 	result := service.CreateDefaultUserService().CreateSession(newSessionModel)
 	if result.Token == nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -31,7 +31,7 @@ func GetSessionV1(w http.ResponseWriter, r *http.Request) {
 	sessionToken := model.DecodeRequestToSessionToken(r)
 	session, err := service.CreateDefaultUserService().GetSession(sessionToken)
 	if err != nil {
-		w.WriteHeader(http.StatusForbidden)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	data, _ := json.Marshal(session)
