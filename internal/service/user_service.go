@@ -94,7 +94,10 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 		return createAuthFailedSessionResponse()
 	}
 
-	user := s.userRepository.GetUserFromEmail(newSession.Email)
+	user, err := s.userRepository.GetUserFromEmail(newSession.Email)
+	if err != nil {
+		return createAuthFailedSessionResponse()
+	}
 
 	if response.AuthenticationResult != nil {
 		s.updateUserTokens(user, response.AuthenticationResult)
@@ -106,9 +109,9 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 }
 
 func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordReset) *AuthResponse {
-	user := s.userRepository.GetUserFromEmail(passwordReset.Email)
+	user, err := s.userRepository.GetUserFromEmail(passwordReset.Email)
 
-	if user == nil {
+	if err != nil {
 		return createAuthFailedSessionResponse()
 	}
 
@@ -163,12 +166,10 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 	if err != nil {
 		return nil, err
 	}
-
 	user := s.userRepository.GetUserFromSessionToken(sessionToken.Token)
 	if user == nil || user.CognitoId.String() != *response.Username {
 		return nil, errors.New("user does not match jwt")
 	}
-
 	return model.CreateSession(model.User{ Uuid: user.Uuid.String() }, sessionToken.Token), nil
 }
 

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/danielmunro/otto-user-service/internal/entity"
 	"github.com/jinzhu/gorm"
 )
@@ -13,10 +14,13 @@ func CreateUserRepository(conn *gorm.DB) *UserRepository {
 	return &UserRepository{ conn }
 }
 
-func (r *UserRepository) GetUserFromEmail(email string) *entity.User {
+func (r *UserRepository) GetUserFromEmail(email string) (*entity.User, error) {
 	user := &entity.User{}
 	r.conn.Where("current_email = ?", email).Find(&user)
-	return user
+	if user.ID == 0 {
+		return nil, errors.New("user not found")
+	}
+	return user, nil
 }
 
 func (r *UserRepository) GetUserFromSessionToken(token string) *entity.User {
