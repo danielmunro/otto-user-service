@@ -124,6 +124,7 @@ components:
       required:
         - id
         - uuid
+        - username
         - name
         - email
         - birthday
@@ -137,6 +138,12 @@ components:
           format: uuid
         name:
           type: string
+        username:
+          type: string
+        profile_pic:
+          type: string
+        bio_message:
+          type: string
         current_email:
           type: string
           format: email
@@ -145,12 +152,16 @@ components:
         birthday:
           type: string
           format: birthday
-        verified:
-          type: boolean
-        created:
+        address_street:
+          type: string
+        address_city:
+          type: string
+        address_zip:
+          type: string
+        created_at:
           type: string
           format: date-time
-        updated:
+        updated_at:
           type: string
           format: date-time
         emails:

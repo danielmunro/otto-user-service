@@ -2,7 +2,6 @@ package entity
 
 import (
 	"encoding/json"
-	"github.com/danielmunro/otto-user-service/internal/enum"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
@@ -20,10 +19,15 @@ type User struct {
 	LastRefreshToken string
 	DeviceGroupKey string
 	DeviceKey string
-	Name string
+	Name    string
+	Username string `gorm:"not null"`
+	ProfilePic string
+	BioMessage string
+	AddressStreet string
+	AddressCity string
+	AddressZip string
 	CurrentEmail string `gorm:"unique;not null"`
 	CurrentPassword string `gorm:"not null"`
-	CurrentStatus string
 	Birthday string
 	Verified bool `gorm:"not null"`
 	Emails []*Email
@@ -36,7 +40,6 @@ func CreateUser(newUser *model.NewUser, cognitoId string) *User {
 		CurrentEmail: newUser.Email,
 		CurrentPassword: string(hashedPassword),
 		CognitoId: uuid.MustParse(cognitoId),
-		CurrentStatus: string(enum.EmailStatusUnverified),
 		Emails: []*Email{
 			CreateEmail(newUser.Email),
 		},

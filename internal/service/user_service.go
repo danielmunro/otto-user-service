@@ -14,6 +14,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/repository"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/segmentio/kafka-go"
 	"os"
@@ -71,7 +72,7 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		return nil, errors.New(err.Error())
 	}
 
-	user := entity.CreateUser(newUser, *response.User.Username)
+	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.User.Username))
 	s.userRepository.Create(user)
 	_ = s.kafkaWriter.WriteMessages(
 		context.Background(),

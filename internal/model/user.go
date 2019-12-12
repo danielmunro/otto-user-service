@@ -15,11 +15,15 @@ import (
 
 type User struct {
 
-	Id int64 `json:"id,omitempty"`
-
 	Uuid string `json:"uuid"`
 
 	Name string `json:"name,omitempty"`
+
+	Username string `json:"username"`
+
+	ProfilePic string `json:"profile_pic,omitempty"`
+
+	BioMessage string `json:"bio_message,omitempty"`
 
 	CurrentEmail string `json:"current_email,omitempty"`
 
@@ -27,11 +31,15 @@ type User struct {
 
 	Birthday string `json:"birthday,omitempty"`
 
-	Verified bool `json:"verified,omitempty"`
+	AddressStreet string `json:"address_street,omitempty"`
 
-	Created time.Time `json:"created,omitempty"`
+	AddressCity string `json:"address_city,omitempty"`
 
-	Updated time.Time `json:"updated,omitempty"`
+	AddressZip string `json:"address_zip,omitempty"`
+
+	CreatedAt time.Time `json:"created_at,omitempty"`
+
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 
 	Emails []Email `json:"emails,omitempty"`
 

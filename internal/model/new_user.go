@@ -18,6 +18,8 @@ type NewUser struct {
 
 	Name string `json:"name,omitempty"`
 
+	Username string `json:"username"`
+
 	Email string `json:"email"`
 
 	Password string `json:"password"`
