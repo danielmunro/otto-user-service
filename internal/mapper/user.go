@@ -24,6 +24,21 @@ func MapUserEntityToModel(user *entity.User) *model.User {
 	}
 }
 
+func MapUserEntityToPublicUser(user *entity.User) *model.PublicUser {
+	return &model.PublicUser{
+		Uuid:            user.Uuid.String(),
+		Name:            user.Name,
+		Username:        user.Username,
+		ProfilePic:      user.ProfilePic,
+		AddressCity:     user.AddressCity,
+		AddressStreet:   user.AddressStreet,
+		AddressZip:      user.AddressZip,
+		BioMessage:      user.BioMessage,
+		Birthday:        user.Birthday,
+		CreatedAt:       user.CreatedAt,
+	}
+}
+
 func MapNewUserModelToEntity(user *model.NewUser, cognitoId uuid.UUID) *entity.User {
 	return &entity.User{
 		Name:      user.Name,

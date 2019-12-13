@@ -61,6 +61,14 @@ func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *k
 	}
 }
 
+func (s *UserService) GetUser(userUuid uuid.UUID) (*model.PublicUser, error) {
+	userEntity, err := s.userRepository.GetUserFromUuid(userUuid)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.MapUserEntityToPublicUser(userEntity), nil
+}
+
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	response, err := s.cognito.AdminCreateUser(&cognitoidentityprovider.AdminCreateUserInput{
 		Username:  aws.String(newUser.Email),

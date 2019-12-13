@@ -81,7 +81,7 @@ var routes = Routes{
 	{
 		"GetUserV1",
 		strings.ToUpper("Get"),
-		"/user",
+		"/user/{uuid}",
 		controller.GetUserV1,
 	},
 

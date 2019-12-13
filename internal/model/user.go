@@ -10,6 +10,8 @@
 package model
 
 import (
+	"encoding/json"
+	"net/http"
 	"time"
 )
 
@@ -44,4 +46,14 @@ type User struct {
 	Emails []Email `json:"emails,omitempty"`
 
 	Passwords []Password `json:"passwords,omitempty"`
+}
+
+func DecodeRequestToUser(r *http.Request) *User {
+	decoder := json.NewDecoder(r.Body)
+	var data *User
+	err := decoder.Decode(&data)
+	if err != nil {
+		panic(err)
+	}
+	return data
 }
