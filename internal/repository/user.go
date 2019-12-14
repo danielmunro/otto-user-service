@@ -15,6 +15,15 @@ func CreateUserRepository(conn *gorm.DB) *UserRepository {
 	return &UserRepository{ conn }
 }
 
+func (r *UserRepository) GetUserFromUsername(username string) (*entity.User, error) {
+	user := &entity.User{}
+	r.conn.Where("username = ?", username).Find(&user)
+	if user.ID == 0 {
+		return nil, errors.New("user not found")
+	}
+	return user, nil
+}
+
 func (r *UserRepository) GetUserFromUuid(uuid uuid.UUID) (*entity.User, error) {
 	user := &entity.User{}
 	r.conn.Where("uuid = ?", uuid.String()).Find(&user)

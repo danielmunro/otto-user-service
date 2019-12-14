@@ -1,6 +1,9 @@
 package service
 
-import "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+import (
+	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/danielmunro/otto-user-service/internal/model"
+)
 
 type AuthResponseType int
 
@@ -14,6 +17,7 @@ const (
 type AuthResponse struct {
 	AuthResponse AuthResponseType
 	Token        *string
+	User         *model.PublicUser
 }
 
 func createSuccessfulRefreshResponse(response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {

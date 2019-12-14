@@ -61,7 +61,15 @@ func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *k
 	}
 }
 
-func (s *UserService) GetUser(userUuid uuid.UUID) (*model.PublicUser, error) {
+func (s *UserService) GetUserFromUsername(username string) (*model.PublicUser, error) {
+	userEntity, err := s.userRepository.GetUserFromUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.MapUserEntityToPublicUser(userEntity), nil
+}
+
+func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, error) {
 	userEntity, err := s.userRepository.GetUserFromUuid(userUuid)
 	if err != nil {
 		return nil, err
@@ -110,11 +118,11 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 
 	if response.AuthenticationResult != nil {
 		s.updateUserTokens(user, response.AuthenticationResult)
-		return createSessionResponse(response)
+		return createSessionResponse(user, response)
 	}
 
 	s.updateUserWithCreateSessionResult(user, response)
-	return createChallengeSessionResponse(response)
+	return createChallengeSessionResponse(user, response)
 }
 
 func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordReset) *AuthResponse {
@@ -179,7 +187,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 	if user == nil || user.CognitoId.String() != *response.Username {
 		return nil, errors.New("user does not match jwt")
 	}
-	return model.CreateSession(model.User{ Uuid: user.Uuid.String() }, sessionToken.Token), nil
+	return model.CreateSession(mapper.MapUserEntityToPublicUser(user), sessionToken.Token), nil
 }
 
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {

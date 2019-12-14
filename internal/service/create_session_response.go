@@ -3,6 +3,9 @@ package service
 import (
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/danielmunro/otto-user-service/internal/entity"
+	"github.com/danielmunro/otto-user-service/internal/mapper"
+	"log"
 )
 
 const challengeNewPasswordString = "ChallengeNewPassword"
@@ -14,16 +17,19 @@ func getAuthResponseFromChallenge(response string) AuthResponseType {
 	return Unknown
 }
 
-func createSessionResponse(response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
+func createSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		Token: response.AuthenticationResult.AccessToken,
+		User: mapper.MapUserEntityToPublicUser(user),
 	}
 }
 
-func createChallengeSessionResponse(response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
+func createChallengeSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
+	log.Print(user, mapper.MapUserEntityToPublicUser(user))
 	return &AuthResponse{
 		getAuthResponseFromChallenge(*response.ChallengeName),
 		response.Session,
+		mapper.MapUserEntityToPublicUser(user),
 	}
 }
 

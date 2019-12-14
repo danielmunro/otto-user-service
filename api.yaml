@@ -18,17 +18,35 @@ paths:
         '201':
           description: |-
             201 response
-  /user/{uuid}:
+#  /user/{uuid}:
+#    get:
+#      operationId: getUserByUUIDV1
+#      summary: Get a user by uuid
+#      parameters:
+#        - in: path
+#          name: uuid
+#          description: a user's unique ID
+#          schema:
+#            type: string
+#            format: uuid
+#      responses:
+#        '200':
+#          description: |-
+#            200 response
+#          content:
+#            application/json:
+#              schema:
+#                $ref: "#/components/schemas/User"
+  /user/{username}:
     get:
-      operationId: getUserV1
-      summary: Get a user
+      operationId: getUserByUsernameV1
+      summary: Get a user by username
       parameters:
         - in: path
-          name: uuid
-          description: a user's unique ID
+          name: username
+          description: a username
           schema:
             type: string
-            format: uuid
       responses:
         '200':
           description: |-

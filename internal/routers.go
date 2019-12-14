@@ -78,11 +78,18 @@ var routes = Routes{
 		GetGroupV1,
 	},
 
+	//{
+	//	"GetUserByUUIDV1",
+	//	strings.ToUpper("Get"),
+	//	"/user/{uuid}",
+	//	controller.GetUserByUUIDV1,
+	//},
+
 	{
-		"GetUserV1",
+		"GetUserByUsernameV1",
 		strings.ToUpper("Get"),
-		"/user/{uuid}",
-		controller.GetUserV1,
+		"/user/{username}",
+		controller.GetUserByUsernameV1,
 	},
 
 	{

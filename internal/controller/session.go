@@ -16,7 +16,8 @@ func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	_, _ = w.Write(result.ToJson())
+	data, _ := json.Marshal(result)
+	_, _ = w.Write(data)
 }
 
 // RespondToChallengeV1 - Respond to an authentication challenge with a password reset
