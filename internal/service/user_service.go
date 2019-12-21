@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -94,6 +95,20 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		context.Background(),
 		kafka.Message{Value: user.ToJson()})
 	return mapper.MapUserEntityToModel(user), nil
+}
+
+func (s *UserService) UpdateUser(userModel *model.User) error {
+	userEntity, err := s.userRepository.GetUserFromUsername(userModel.Username)
+	if err != nil {
+		return err
+	}
+	userEntity.UpdateUserProfileFromModel(userModel)
+	data, _ := json.Marshal(userModel)
+	s.userRepository.Save(userEntity)
+	_ = s.kafkaWriter.WriteMessages(
+		context.Background(),
+		kafka.Message{Value: data})
+	return nil
 }
 
 func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse {

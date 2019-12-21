@@ -8,15 +8,15 @@ type PublicUser struct {
 
 	Uuid string `json:"uuid"`
 
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	Username string `json:"username"`
 
-	ProfilePic string `json:"profile_pic,omitempty"`
+	ProfilePic string `json:"profile_pic"`
 
-	BioMessage string `json:"bio_message,omitempty"`
+	BioMessage string `json:"bio_message"`
 
-	Birthday string `json:"birthday,omitempty"`
+	Birthday string `json:"birthday"`
 
 	AddressStreet string `json:"address_street,omitempty"`
 

@@ -46,6 +46,13 @@ func CreateUser(newUser *model.NewUser, cognitoId string) *User {
 	}
 }
 
+func (u *User) UpdateUserProfileFromModel(user *model.User) {
+	u.Name = user.Name
+	u.ProfilePic = user.ProfilePic
+	u.BioMessage = user.BioMessage
+	u.Birthday = user.Birthday
+}
+
 func (u *User) ToJson() []byte {
 	data, _ := json.Marshal(u)
 	return data

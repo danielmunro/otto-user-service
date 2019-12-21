@@ -46,3 +46,16 @@ func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
 	data, _ := json.Marshal(user)
 	_, _ = w.Write(data)
 }
+
+// UpdateUserV1 - Update a user
+func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
+	userModel := model.DecodeRequestToUser(r)
+	err := service.CreateDefaultUserService().UpdateUser(userModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	data, _ := json.Marshal(userModel)
+	_, _ = w.Write(data)
+}

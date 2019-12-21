@@ -119,4 +119,11 @@ var routes = Routes{
 		"/session",
 		controller.RefreshSessionV1,
 	},
+
+	{
+		"UpdateUserV1",
+		strings.ToUpper("Put"),
+		"/user",
+		controller.UpdateUserV1,
+	},
 }

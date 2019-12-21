@@ -18,6 +18,20 @@ paths:
         '201':
           description: |-
             201 response
+    put:
+      operationId: updateUserV1
+      summary: Update a username
+      requestBody:
+        description: user to update
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: |-
+            200 response
 #  /user/{uuid}:
 #    get:
 #      operationId: getUserByUUIDV1
