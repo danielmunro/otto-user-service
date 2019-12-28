@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/service"
+	"log"
 	"net/http"
 )
 
@@ -34,6 +35,7 @@ func GetSessionV1(w http.ResponseWriter, r *http.Request) {
 	session, err := service.CreateDefaultUserService().GetSession(sessionToken)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
+		log.Print(err)
 		return
 	}
 	data, _ := json.Marshal(session)
