@@ -40,7 +40,7 @@ func CreateDefaultUserService() *UserService {
 	return CreateUserService(
 		repository.CreateUserRepository(db.CreateDefaultConnection()),
 		kafka.NewWriter(kafka.WriterConfig{
-			Brokers: []string{"localhost:9092"},
+			Brokers: []string{os.Getenv("KAFKA_HOST")},
 			Topic: string(constants.Users),
 			Balancer: &kafka.LeastBytes{},
 		}))
