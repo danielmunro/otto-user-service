@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"github.com/danielmunro/otto-user-service/internal/entity"
 	"github.com/danielmunro/otto-user-service/internal/mapper"
-	"log"
 )
 
 const challengeNewPasswordString = "ChallengeNewPassword"
@@ -25,17 +24,17 @@ func createSessionResponse(user *entity.User, response *cognitoidentityprovider.
 }
 
 func createChallengeSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
-	log.Print(user, mapper.MapUserEntityToPublicUser(user))
 	return &AuthResponse{
-		getAuthResponseFromChallenge(*response.ChallengeName),
-		response.Session,
-		mapper.MapUserEntityToPublicUser(user),
+		AuthResponse: getAuthResponseFromChallenge(*response.ChallengeName),
+		Token: response.Session,
+		User: mapper.MapUserEntityToPublicUser(user),
 	}
 }
 
-func createAuthFailedSessionResponse() *AuthResponse {
+func createAuthFailedSessionResponse(message string) *AuthResponse {
 	return &AuthResponse{
 		AuthResponse: SessionFailedAuthentication,
+		Message: message,
 	}
 }
 

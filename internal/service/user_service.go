@@ -89,11 +89,12 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		return nil, errors.New(err.Error())
 	}
 
-	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.User.Username))
+	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.User.Attributes[0].Value))
 	s.userRepository.Create(user)
+	userData, _ := json.Marshal(user)
 	_ = s.kafkaWriter.WriteMessages(
 		context.Background(),
-		kafka.Message{Value: user.ToJson()})
+		kafka.Message{Value: userData})
 	return mapper.MapUserEntityToModel(user), nil
 }
 
@@ -123,12 +124,12 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 	})
 
 	if err != nil {
-		return createAuthFailedSessionResponse()
+		return createAuthFailedSessionResponse("auth failed")
 	}
 
 	user, err := s.userRepository.GetUserFromEmail(newSession.Email)
 	if err != nil {
-		return createAuthFailedSessionResponse()
+		return createAuthFailedSessionResponse("user not found")
 	}
 
 	if response.AuthenticationResult != nil {
@@ -144,7 +145,7 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 	user, err := s.userRepository.GetUserFromEmail(passwordReset.Email)
 
 	if err != nil {
-		return createAuthFailedSessionResponse()
+		return createAuthFailedSessionResponse("user not found")
 	}
 
 	data := &cognitoidentityprovider.AdminRespondToAuthChallengeInput{
@@ -161,7 +162,7 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 	response, err := s.cognito.AdminRespondToAuthChallenge(data)
 
 	if err != nil {
-		return createAuthFailedSessionResponse()
+		return createAuthFailedSessionResponse("auth failed")
 	}
 
 	if response.AuthenticationResult != nil {
@@ -209,7 +210,7 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	user := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
 
 	if user == nil {
-		return createAuthFailedSessionResponse()
+		return createAuthFailedSessionResponse("auth failed")
 	}
 
 	result, err := s.cognito.AdminInitiateAuth(&cognitoidentityprovider.AdminInitiateAuthInput{
@@ -223,7 +224,7 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	})
 
 	if err != nil {
-		return createAuthFailedSessionResponse()
+		return createAuthFailedSessionResponse("auth failed")
 	}
 
 	s.updateUserTokens(user, result.AuthenticationResult)

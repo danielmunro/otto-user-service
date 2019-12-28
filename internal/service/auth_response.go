@@ -18,6 +18,7 @@ type AuthResponse struct {
 	AuthResponse AuthResponseType
 	Token        *string
 	User         *model.PublicUser
+	Message      string
 }
 
 func createSuccessfulRefreshResponse(response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
