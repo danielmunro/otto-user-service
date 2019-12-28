@@ -86,16 +86,17 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	})
 
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return nil, err
 	}
 
 	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.User.Attributes[0].Value))
 	s.userRepository.Create(user)
-	userData, _ := json.Marshal(user)
+	userModel := mapper.MapUserEntityToModel(user)
+	userData, _ := json.Marshal(userModel)
 	_ = s.kafkaWriter.WriteMessages(
 		context.Background(),
 		kafka.Message{Value: userData})
-	return mapper.MapUserEntityToModel(user), nil
+	return userModel, nil
 }
 
 func (s *UserService) UpdateUser(userModel *model.User) error {

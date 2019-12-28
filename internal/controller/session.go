@@ -24,7 +24,8 @@ func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 func RespondToChallengeV1(w http.ResponseWriter, r *http.Request) {
 	passwordResetModel := model.DecodeRequestToPasswordReset(r)
 	result := service.CreateDefaultUserService().ProvideChallengeResponse(passwordResetModel)
-	_, _ = w.Write(result.ToJson())
+	data, _ := json.Marshal(result)
+	_, _ = w.Write(data)
 }
 
 // GetSessionV1 - validate a session token

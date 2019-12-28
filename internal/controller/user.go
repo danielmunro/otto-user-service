@@ -5,6 +5,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/service"
 	"github.com/danielmunro/otto-user-service/internal/util"
+	"log"
 	"net/http"
 )
 
@@ -14,6 +15,7 @@ func CreateNewUserV1(w http.ResponseWriter, r *http.Request) {
 	user, err := service.CreateDefaultUserService().CreateUser(newUserModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		log.Print(err)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
