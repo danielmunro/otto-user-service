@@ -35,6 +35,7 @@ func GetSessionV1(w http.ResponseWriter, r *http.Request) {
 	session, err := service.CreateDefaultUserService().GetSession(sessionToken)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
+		log.Print("sanity: ", sessionToken.Token)
 		log.Print(err)
 		return
 	}
