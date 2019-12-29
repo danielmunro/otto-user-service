@@ -140,6 +140,7 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 	}
 
 	s.updateUserWithCreateSessionResult(user, response)
+	log.Print("created session from AWS: ", response.String())
 	return createChallengeSessionResponse(user, response)
 }
 
@@ -191,6 +192,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 		return nil, errors.New("no session found")
 	})
 	if parseErr != nil {
+		log.Print("jwt parse error")
 		return nil, parseErr
 	}
 
