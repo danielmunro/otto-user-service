@@ -135,6 +135,7 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 	}
 
 	if response.AuthenticationResult != nil {
+		log.Print("updating user tokens with response from AWS for user ID: ", user.ID, ", response: ", response.String())
 		s.updateUserTokens(user, response.AuthenticationResult)
 		return createSessionResponse(user, response)
 	}
@@ -151,7 +152,7 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 		return createAuthFailedSessionResponse("user not found")
 	}
 
-	log.Print("requesting reset with: ", passwordReset.Email)
+	log.Print("requesting reset with: ", passwordReset.Email, ", session: ", user.LastSessionToken)
 
 	data := &cognitoidentityprovider.AdminRespondToAuthChallengeInput{
 		ChallengeName:      aws.String(AuthResponseChallenge),

@@ -34,7 +34,7 @@ func Test_CreateNewUser_SanityCheck(t *testing.T) {
 	})
 
 	if user == nil || err != nil {
-		t.Error("nil user")
+		t.Error(err)
 	}
 }
 
