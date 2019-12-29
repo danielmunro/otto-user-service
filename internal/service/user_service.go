@@ -214,7 +214,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 		return nil, err
 	}
 	user := s.userRepository.GetUserFromSessionToken(sessionToken.Token)
-	if user == nil || user.CognitoId.String() != *response.Username {
+	if user == nil || user.CurrentEmail != *response.Username {
 		log.Print("user does not match jwt: ", response.String(), " and user: ", user)
 		return nil, errors.New("user does not match jwt")
 	}
