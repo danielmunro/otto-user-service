@@ -151,10 +151,12 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 		return createAuthFailedSessionResponse("user not found")
 	}
 
+	log.Print("requesting reset with: ", passwordReset.Email)
+
 	data := &cognitoidentityprovider.AdminRespondToAuthChallengeInput{
 		ChallengeName:      aws.String(AuthResponseChallenge),
 		ChallengeResponses: map[string]*string{
-			"USERNAME":     aws.String(passwordReset.Email),
+			"EMAIL":     aws.String(passwordReset.Email),
 			"NEW_PASSWORD": aws.String(passwordReset.Password),
 		},
 		ClientId:           aws.String(s.cognitoClientID),
