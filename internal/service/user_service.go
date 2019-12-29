@@ -168,6 +168,8 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 		return createAuthFailedSessionResponse("auth failed")
 	}
 
+	log.Print("response from provide challenge: ", response.String())
+
 	if response.AuthenticationResult != nil {
 		s.updateUserTokens(user, response.AuthenticationResult)
 	}
