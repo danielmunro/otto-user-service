@@ -165,6 +165,7 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 	response, err := s.cognito.AdminRespondToAuthChallenge(data)
 
 	if err != nil {
+		log.Print("error responding to auth challenge: ", err)
 		return createAuthFailedSessionResponse("auth failed")
 	}
 
