@@ -156,7 +156,7 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 	data := &cognitoidentityprovider.AdminRespondToAuthChallengeInput{
 		ChallengeName:      aws.String(AuthResponseChallenge),
 		ChallengeResponses: map[string]*string{
-			"EMAIL":     aws.String(passwordReset.Email),
+			"USERNAME":     aws.String(passwordReset.Email),
 			"NEW_PASSWORD": aws.String(passwordReset.Password),
 		},
 		ClientId:           aws.String(s.cognitoClientID),
