@@ -8,9 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
-	"github.com/danielmunro/otto-user-service/internal/constants"
 	"github.com/danielmunro/otto-user-service/internal/db"
 	"github.com/danielmunro/otto-user-service/internal/entity"
+	kafka2 "github.com/danielmunro/otto-user-service/internal/kafka"
 	"github.com/danielmunro/otto-user-service/internal/mapper"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/repository"
@@ -40,11 +40,7 @@ const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.js
 func CreateDefaultUserService() *UserService {
 	return CreateUserService(
 		repository.CreateUserRepository(db.CreateDefaultConnection()),
-		kafka.NewWriter(kafka.WriterConfig{
-			Brokers: []string{os.Getenv("KAFKA_HOST")},
-			Topic: string(constants.Users),
-			Balancer: &kafka.LeastBytes{},
-		}))
+		kafka2.CreateWriter(os.Getenv("KAFKA_HOST")))
 }
 
 func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *kafka.Writer) *UserService {
@@ -94,6 +90,7 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	s.userRepository.Create(user)
 	userModel := mapper.MapUserEntityToModel(user)
 	userData, _ := json.Marshal(userModel)
+	log.Print("publishing user to kafka: ", string(userData))
 	_ = s.kafkaWriter.WriteMessages(
 		context.Background(),
 		kafka.Message{Value: userData})
@@ -198,7 +195,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 		return nil, errors.New("no session found")
 	})
 	if parseErr != nil {
-		log.Print("jwt parse error")
+		log.Print("jwt parse error", parseErr)
 		return nil, parseErr
 	}
 
