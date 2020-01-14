@@ -56,6 +56,6 @@ func (r *UserRepository) Save(user *entity.User) {
 	r.conn.Save(user)
 }
 
-func (r *UserRepository) Update(user *entity.User) {
-	r.conn.Update(user)
+func (r *UserRepository) UpdateProfilePic(user *entity.User) {
+	r.conn.Model(user).Update("profile_pic")
 }

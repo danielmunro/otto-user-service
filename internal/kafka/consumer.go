@@ -40,6 +40,6 @@ func loopKafkaReader(userRepository *repository.UserRepository, reader *kafka.Re
 		}
 		log.Print("update user with s3 key", userEntity.Uuid.String(), image.S3Key)
 		userEntity.ProfilePic = image.S3Key
-		userRepository.Update(userEntity)
+		userRepository.UpdateProfilePic(userEntity)
 	}
 }
