@@ -21,6 +21,7 @@ func InitializeAndRunLoop(kafkaHost string) {
 
 func loopKafkaReader(userRepository *repository.UserRepository, reader *kafka.Reader) error {
 	for {
+		log.Print("kafka ready to consume image messages")
 		data, err := reader.ReadMessage(context.Background())
 		if err != nil  {
 			log.Print(err)
@@ -33,9 +34,12 @@ func loopKafkaReader(userRepository *repository.UserRepository, reader *kafka.Re
 			continue
 		}
 		userEntity, err := userRepository.GetUserFromUuid(uuid.MustParse(image.User.Uuid))
-		if err == nil {
-			userEntity.ProfilePic = image.S3Key
-			userRepository.Update(userEntity)
+		if err != nil {
+			log.Print("user not found when updating profile pic")
+			continue
 		}
+		log.Print("update user with s3 key", userEntity.Uuid.String(), image.S3Key)
+		userEntity.ProfilePic = image.S3Key
+		userRepository.Update(userEntity)
 	}
 }
