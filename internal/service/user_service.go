@@ -221,6 +221,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 }
 
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {
+	log.Print("request refresh session :: ", sessionRefresh)
 	user := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
 
 	if user == nil {
@@ -238,6 +239,7 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	})
 
 	if err != nil {
+		log.Print("error refreshing user session :: ", err)
 		return createAuthFailedSessionResponse("auth failed")
 	}
 
