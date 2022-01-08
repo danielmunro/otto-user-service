@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+      - run: go vet ./...
+      - run: |
+          echo $CR_PAT | docker login ghcr.io -u danielmunro --password-stdin
+        env:
+          CR_PAT: ${{ secrets.CR_PAT }}
+      - run: docker build -t ghcr.io/danielmunro/otto-user-service:latest .
+      - run: docker push ghcr.io/danielmunro/otto-user-service:latest
