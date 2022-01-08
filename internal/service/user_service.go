@@ -143,9 +143,11 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 }
 
 func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordReset) *AuthResponse {
+	log.Print("provide challenge response :: ", passwordReset)
 	user, err := s.userRepository.GetUserFromEmail(passwordReset.Email)
 
 	if err != nil {
+		log.Print("user not found")
 		return createAuthFailedSessionResponse("user not found")
 	}
 
