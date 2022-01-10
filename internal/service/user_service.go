@@ -221,7 +221,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 }
 
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {
-	log.Print("request refresh session :: ", sessionRefresh)
+	log.Print("request refresh session :: ", sessionRefresh.Token)
 	user := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
 
 	if user == nil {
