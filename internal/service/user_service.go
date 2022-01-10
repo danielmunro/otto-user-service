@@ -228,6 +228,10 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 		return createAuthFailedSessionResponse("auth failed")
 	}
 
+	if user.LastRefreshToken == "" {
+		return createAuthFailedSessionResponse("no available refresh tokens")
+	}
+
 	result, err := s.cognito.AdminInitiateAuth(&cognitoidentityprovider.AdminInitiateAuthInput{
 		AuthFlow:          aws.String(AuthFlowRefreshToken),
 		AuthParameters:    map[string]*string{
