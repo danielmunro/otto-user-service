@@ -77,7 +77,18 @@ spec:
               secretKeyRef:
                 name: cognito
                 key: aws_region
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: client_id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: client_secret
       imagePullSecrets:
       - name: dockerconfigjson-github-com
       - name: postgres-user
       - name: cognito
+      - name: aws
