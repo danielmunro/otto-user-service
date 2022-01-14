@@ -57,7 +57,7 @@ spec:
               secretKeyRef:
                 name: postgres-user
                 key: port
-          - name: POSTGRES_DATABASE
+          - name: POSTGRES_DBNAME
             valueFrom:
               secretKeyRef:
                 name: postgres-user
