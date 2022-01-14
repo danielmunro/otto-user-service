@@ -40,23 +40,28 @@ spec:
           - name: POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: postgres
+                name: postgres-user
                 key: host
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: postgres
+                name: postgres-user
                 key: user
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgres
+                name: postgres-user
                 key: password
           - name: POSTGRES_PORT
             valueFrom:
               secretKeyRef:
-                name: postgres
+                name: postgres-user
                 key: port
+          - name: POSTGRES_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: postgres-user
+                key: database
       imagePullSecrets:
       - name: dockerconfigjson-github-com
       - name: postgres
