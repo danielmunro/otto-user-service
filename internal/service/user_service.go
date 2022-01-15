@@ -91,9 +91,12 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	userModel := mapper.MapUserEntityToModel(user)
 	userData, _ := json.Marshal(userModel)
 	log.Print("publishing user to kafka: ", string(userData))
-	_ = s.kafkaWriter.WriteMessages(
+	err = s.kafkaWriter.WriteMessages(
 		context.Background(),
 		kafka.Message{Value: userData})
+	if err != nil {
+		log.Print(err)
+	}
 	return userModel, nil
 }
 
