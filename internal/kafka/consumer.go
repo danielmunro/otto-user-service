@@ -10,8 +10,8 @@ import (
 	"log"
 )
 
-func InitializeAndRunLoop(kafkaHost string) {
-	reader := GetReader(kafkaHost)
+func InitializeAndRunLoop() {
+	reader := GetReader()
 	userRepository := repository.CreateUserRepository(db.CreateDefaultConnection())
 	err := loopKafkaReader(userRepository, reader)
 	if err != nil {
@@ -21,13 +21,13 @@ func InitializeAndRunLoop(kafkaHost string) {
 
 func loopKafkaReader(userRepository *repository.UserRepository, reader *kafka.Reader) error {
 	for {
-		log.Print("kafka ready to consume image messages")
+		log.Print("kafka ready to consume messages")
 		data, err := reader.ReadMessage(context.Background())
 		if err != nil  {
 			log.Print(err)
 			return nil
 		}
-		log.Print("consuming image message ", string(data.Value))
+		log.Print("consuming message ", string(data.Value))
 		image, err := model.DecodeMessageToImage(data.Value)
 		if err != nil {
 			log.Print("error decoding message to user, skipping", string(data.Value))

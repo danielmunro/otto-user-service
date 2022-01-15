@@ -87,8 +87,34 @@ spec:
               secretKeyRef:
                 name: aws
                 key: client_secret
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            valueFrom:
+              secretKeyRef:
+                name: kafka
+                key: bootstrap_servers
+          - name: KAFKA_SECURITY_PROTOCOL
+            valueFrom:
+              secretKeyRef:
+                name: kafka
+                key: security_protocol
+          - name: KAFKA_SASL_MECHANISM
+            valueFrom:
+              secretKeyRef:
+                name: kafka
+                key: sasl_mechanism
+          - name: KAFKA_SASL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: kafka
+                key: sasl_username
+          - name: KAFKA_SASL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: kafka
+                key: sasl_password
       imagePullSecrets:
       - name: dockerconfigjson-github-com
       - name: postgres-user
       - name: cognito
       - name: aws
+      - name: kafka
