@@ -10,7 +10,7 @@ import (
 )
 
 func CreateWriter() *kafka.Writer {
-	log.Print("server", os.Getenv("KAFKA_BOOTSTRAP_SERVER"))
+	log.Print("server", os.Getenv("KAFKA_BOOTSTRAP_SERVERS"))
 	log.Print("user", os.Getenv("KAFKA_SASL_USERNAME"))
 	log.Print("pw", os.Getenv("KAFKA_SASL_PASSWORD"))
 	mechanism := plain.Mechanism{
@@ -25,7 +25,7 @@ func CreateWriter() *kafka.Writer {
 	}
 
 	return kafka.NewWriter(kafka.WriterConfig{
-		Brokers:   []string{os.Getenv("KAFKA_BOOTSTRAP_SERVER")},
+		Brokers:   []string{os.Getenv("KAFKA_BOOTSTRAP_SERVERS")},
 		Topic: string(constants.Users),
 		Dialer: dialer,
 	})

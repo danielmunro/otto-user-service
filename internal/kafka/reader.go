@@ -21,7 +21,7 @@ func GetReader() *kafka.Reader {
 	}
 
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{os.Getenv("KAFKA_BOOTSTRAP_SERVER")},
+		Brokers:   []string{os.Getenv("KAFKA_BOOTSTRAP_SERVERS")},
 		Topic:     string(constants.Images),
 		GroupID: "user_service",
 		Partition: 0,
