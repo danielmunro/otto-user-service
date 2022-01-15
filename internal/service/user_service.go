@@ -40,7 +40,7 @@ const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.js
 func CreateDefaultUserService() *UserService {
 	return CreateUserService(
 		repository.CreateUserRepository(db.CreateDefaultConnection()),
-		kafka2.CreateWriter(os.Getenv("KAFKA_HOST")))
+		kafka2.CreateWriter())
 }
 
 func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *kafka.Writer) *UserService {
