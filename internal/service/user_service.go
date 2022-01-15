@@ -113,9 +113,14 @@ func (s *UserService) UpdateUser(userModel *model.User) error {
 	userEntity.UpdateUserProfileFromModel(userModel)
 	data, _ := json.Marshal(userModel)
 	s.userRepository.Save(userEntity)
-	_ = s.kafkaWriter.WriteMessages(
-		context.Background(),
-		kafka.Message{Value: data})
+	topic := "users"
+	_ = s.kafkaWriter.Produce(
+		&kafka.Message{
+			Value: data,
+			TopicPartition: kafka.TopicPartition{Topic: &topic,
+				Partition: kafka.PartitionAny},
+		},
+		nil)
 	return nil
 }
 
