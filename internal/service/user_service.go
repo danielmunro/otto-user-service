@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/danielmunro/otto-user-service/internal/db"
 	"github.com/danielmunro/otto-user-service/internal/entity"
 	kafka2 "github.com/danielmunro/otto-user-service/internal/kafka"
@@ -17,7 +18,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/segmentio/kafka-go"
 	"log"
 	"os"
 )
@@ -29,7 +29,7 @@ type UserService struct {
 	cognito             *cognitoidentityprovider.CognitoIdentityProvider
 	awsRegion           string
 	userRepository      *repository.UserRepository
-	kafkaWriter         *kafka.Writer
+	kafkaWriter         *kafka.Producer
 }
 
 const AuthFlowAdminNoSRP = "ADMIN_NO_SRP_AUTH"
@@ -43,7 +43,7 @@ func CreateDefaultUserService() *UserService {
 		kafka2.CreateWriter())
 }
 
-func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *kafka.Writer) *UserService {
+func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *kafka.Producer) *UserService {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -91,9 +91,14 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	userModel := mapper.MapUserEntityToModel(user)
 	userData, _ := json.Marshal(userModel)
 	log.Print("publishing user to kafka: ", string(userData))
-	err = s.kafkaWriter.WriteMessages(
-		context.Background(),
-		kafka.Message{Value: userData})
+	topic := "users"
+	err = s.kafkaWriter.Produce(
+		&kafka.Message{
+			Value: userData,
+			TopicPartition: kafka.TopicPartition{Topic: &topic,
+				Partition: kafka.PartitionAny},
+		},
+		nil)
 	if err != nil {
 		log.Print(err)
 	}

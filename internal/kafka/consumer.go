@@ -1,28 +1,27 @@
 package kafka
 
 import (
-	"context"
 	"github.com/danielmunro/otto-user-service/internal/db"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/repository"
 	"github.com/google/uuid"
-	"github.com/segmentio/kafka-go"
 	"log"
 )
 
 func InitializeAndRunLoop() {
-	reader := GetReader()
+
 	userRepository := repository.CreateUserRepository(db.CreateDefaultConnection())
-	err := loopKafkaReader(userRepository, reader)
+	err := loopKafkaReader(userRepository)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func loopKafkaReader(userRepository *repository.UserRepository, reader *kafka.Reader) error {
+func loopKafkaReader(userRepository *repository.UserRepository) error {
+	reader := GetReader()
 	for {
 		log.Print("kafka ready to consume messages")
-		data, err := reader.ReadMessage(context.Background())
+		data, err := reader.ReadMessage(-1)
 		if err != nil  {
 			log.Print(err)
 			return nil
@@ -30,7 +29,7 @@ func loopKafkaReader(userRepository *repository.UserRepository, reader *kafka.Re
 		log.Print("consuming message ", string(data.Value))
 		image, err := model.DecodeMessageToImage(data.Value)
 		if err != nil {
-			log.Print("error decoding message to user, skipping", string(data.Value))
+			log.Print("error decoding message to image, skipping", string(data.Value))
 			continue
 		}
 		userEntity, err := userRepository.GetUserFromUuid(uuid.MustParse(image.User.Uuid))

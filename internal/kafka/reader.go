@@ -1,33 +1,25 @@
 package kafka
 
 import (
-	"github.com/danielmunro/otto-user-service/internal/constants"
-	"github.com/segmentio/kafka-go"
-	"github.com/segmentio/kafka-go/sasl/plain"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
-	"time"
 )
 
-func GetReader() *kafka.Reader {
-	mechanism := plain.Mechanism{
-		Username: os.Getenv("KAFKA_SASL_USERNAME"),
-		Password: os.Getenv("KAFKA_SASL_PASSWORD"),
-	}
-
-	dialer := &kafka.Dialer{
-		Timeout:       10 * time.Second,
-		DualStack:     true,
-		SASLMechanism: mechanism,
-	}
-
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{os.Getenv("KAFKA_BOOTSTRAP_SERVERS")},
-		Topic:     string(constants.Images),
-		GroupID: "user_service",
-		Partition: 0,
-		MinBytes:  10e3, // 10KB
-		MaxBytes:  10e6, // 10MB
-		Dialer: dialer,
+func GetReader() *kafka.Consumer {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": os.Getenv("KAFKA_BOOTSTRAP_SERVERS"),
+		"security.protocol": os.Getenv("KAFKA_SECURITY_PROTOCOL"),
+		"sasl.mechanisms": os.Getenv("KAFKA_SASL_MECHANISMS"),
+		"sasl.username": os.Getenv("KAFKA_SASL_USERNAME"),
+		"sasl.password": os.Getenv("KAFKA_SASL_PASSWORD"),
+		"group.id": "otto",
+		"auto.offset.reset": "earliest",
 	})
-	return r
+
+	if err != nil {
+		panic(err)
+	}
+
+	c.SubscribeTopics([]string{"images"}, nil)
+	return c
 }
