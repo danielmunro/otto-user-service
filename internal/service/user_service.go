@@ -76,9 +76,9 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	response, err := s.cognito.AdminCreateUser(&cognitoidentityprovider.AdminCreateUserInput{
-		Username:  aws.String(newUser.Email),
+		Username:          aws.String(newUser.Email),
 		TemporaryPassword: aws.String(newUser.Password),
-		UserPoolId: aws.String(s.cognitoUserPool),
+		UserPoolId:        aws.String(s.cognitoUserPool),
 	})
 
 	if err != nil {
@@ -105,7 +105,7 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 }
 
 func (s *UserService) UpdateUser(userModel *model.User) error {
-	userEntity, err := s.userRepository.GetUserFromUsername(userModel.Username)
+	userEntity, err := s.userRepository.GetUserFromUuid(uuid.MustParse(userModel.Uuid))
 	if err != nil {
 		return err
 	}
@@ -125,13 +125,13 @@ func (s *UserService) UpdateUser(userModel *model.User) error {
 
 func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse {
 	response, err := s.cognito.AdminInitiateAuth(&cognitoidentityprovider.AdminInitiateAuthInput{
-		AuthFlow:          aws.String(AuthFlowAdminNoSRP),
-		AuthParameters:    map[string]*string{
+		AuthFlow: aws.String(AuthFlowAdminNoSRP),
+		AuthParameters: map[string]*string{
 			"USERNAME": aws.String(newSession.Email),
 			"PASSWORD": aws.String(newSession.Password),
 		},
-		ClientId:          aws.String(s.cognitoClientID),
-		UserPoolId:        aws.String(s.cognitoUserPool),
+		ClientId:   aws.String(s.cognitoClientID),
+		UserPoolId: aws.String(s.cognitoUserPool),
 	})
 
 	if err != nil {
@@ -166,14 +166,14 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 	log.Print("requesting reset with: ", passwordReset.Email, ", session: ", user.LastSessionToken)
 
 	data := &cognitoidentityprovider.AdminRespondToAuthChallengeInput{
-		ChallengeName:      aws.String(AuthResponseChallenge),
+		ChallengeName: aws.String(AuthResponseChallenge),
 		ChallengeResponses: map[string]*string{
 			"USERNAME":     aws.String(passwordReset.Email),
 			"NEW_PASSWORD": aws.String(passwordReset.Password),
 		},
-		ClientId:           aws.String(s.cognitoClientID),
-		Session:            aws.String(user.LastSessionToken),
-		UserPoolId:         aws.String(s.cognitoUserPool),
+		ClientId:   aws.String(s.cognitoClientID),
+		Session:    aws.String(user.LastSessionToken),
+		UserPoolId: aws.String(s.cognitoUserPool),
 	}
 
 	response, err := s.cognito.AdminRespondToAuthChallenge(data)
@@ -219,7 +219,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 		return nil, errors.New("verification failed")
 	}
 
-	response, err := s.cognito.GetUser(&cognitoidentityprovider.GetUserInput{ AccessToken: aws.String(sessionToken.Token) })
+	response, err := s.cognito.GetUser(&cognitoidentityprovider.GetUserInput{AccessToken: aws.String(sessionToken.Token)})
 	if err != nil {
 		log.Print("error retrieving user: ", err)
 		return nil, err
@@ -245,13 +245,13 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	}
 
 	result, err := s.cognito.AdminInitiateAuth(&cognitoidentityprovider.AdminInitiateAuthInput{
-		AuthFlow:          aws.String(AuthFlowRefreshToken),
-		AuthParameters:    map[string]*string{
+		AuthFlow: aws.String(AuthFlowRefreshToken),
+		AuthParameters: map[string]*string{
 			"REFRESH_TOKEN": aws.String(user.LastRefreshToken),
-			"DEVICE_KEY": 	 aws.String(user.DeviceKey),
+			"DEVICE_KEY":    aws.String(user.DeviceKey),
 		},
-		ClientId:          aws.String(s.cognitoClientID),
-		UserPoolId:        aws.String(s.cognitoUserPool),
+		ClientId:   aws.String(s.cognitoClientID),
+		UserPoolId: aws.String(s.cognitoUserPool),
 	})
 
 	if err != nil {
