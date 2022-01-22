@@ -22,7 +22,7 @@ func loopKafkaReader(userRepository *repository.UserRepository) error {
 	for {
 		log.Print("kafka ready to consume messages")
 		data, err := reader.ReadMessage(-1)
-		if err != nil  {
+		if err != nil {
 			log.Print(err)
 			return nil
 		}
@@ -39,6 +39,6 @@ func loopKafkaReader(userRepository *repository.UserRepository) error {
 		}
 		log.Print("update user with s3 key", userEntity.Uuid.String(), image.S3Key)
 		userEntity.ProfilePic = image.S3Key
-		userRepository.UpdateProfilePic(userEntity)
+		userRepository.Save(userEntity)
 	}
 }

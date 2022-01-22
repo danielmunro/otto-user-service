@@ -12,7 +12,7 @@ type UserRepository struct {
 }
 
 func CreateUserRepository(conn *gorm.DB) *UserRepository {
-	return &UserRepository{ conn }
+	return &UserRepository{conn}
 }
 
 func (r *UserRepository) GetUserFromUsername(username string) (*entity.User, error) {
@@ -54,8 +54,4 @@ func (r *UserRepository) Create(user *entity.User) {
 
 func (r *UserRepository) Save(user *entity.User) {
 	r.conn.Save(user)
-}
-
-func (r *UserRepository) UpdateProfilePic(user *entity.User) {
-	r.conn.Model(&user).Update("profile_pic", user.ProfilePic)
 }
