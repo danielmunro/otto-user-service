@@ -40,6 +40,7 @@ paths:
         - in: path
           name: uuid
           description: a user's unique ID
+          required: true
           schema:
             type: string
             format: uuid
@@ -234,11 +235,14 @@ components:
        email:
          type: string
          format: email
+       username:
+         type: string
        password:
          type: string
     Password:
       type: object
       required:
+        - uuid
         - password
       properties:
         id:
