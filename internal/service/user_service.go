@@ -224,8 +224,8 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 		log.Print("error retrieving user: ", err)
 		return nil, err
 	}
-	user := s.userRepository.GetUserFromSessionToken(sessionToken.Token)
-	if user == nil || user.CurrentEmail != *response.Username {
+	user, err := s.userRepository.GetUserFromSessionToken(sessionToken.Token)
+	if err != nil {
 		log.Print("user does not match jwt: ", response.String(), " and user: ", user)
 		return nil, errors.New("user does not match jwt")
 	}
@@ -234,9 +234,9 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {
 	log.Print("request refresh session :: ", sessionRefresh.Token)
-	user := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
+	user, err := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
 
-	if user == nil {
+	if err != nil {
 		return createAuthFailedSessionResponse("auth failed")
 	}
 

@@ -42,10 +42,13 @@ func (r *UserRepository) GetUserFromEmail(email string) (*entity.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) GetUserFromSessionToken(token string) *entity.User {
+func (r *UserRepository) GetUserFromSessionToken(token string) (*entity.User, error) {
 	user := &entity.User{}
 	r.conn.Where("last_access_token = ?", token).Find(&user)
-	return user
+	if user.ID == 0 {
+		return nil, errors.New("user not found")
+	}
+	return user, nil
 }
 
 func (r *UserRepository) Create(user *entity.User) {
