@@ -228,6 +228,7 @@ components:
       type: object
       required:
         - email
+        - username
         - password
       properties:
        name:
