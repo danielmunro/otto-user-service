@@ -19,22 +19,24 @@ func getAuthResponseFromChallenge(response string) AuthResponseType {
 func createSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		Token: response.AuthenticationResult.AccessToken,
-		User: mapper.MapUserEntityToPublicUser(user),
+		User:  mapper.MapUserEntityToPublicUser(user),
 	}
 }
 
 func createChallengeSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		AuthResponse: getAuthResponseFromChallenge(*response.ChallengeName),
-		Token: response.Session,
-		User: mapper.MapUserEntityToPublicUser(user),
+		Token:        response.Session,
+		User:         mapper.MapUserEntityToPublicUser(user),
 	}
 }
 
 func createAuthFailedSessionResponse(message string) *AuthResponse {
+	token := ""
 	return &AuthResponse{
 		AuthResponse: SessionFailedAuthentication,
-		Message: message,
+		Message:      message,
+		Token:        &token,
 	}
 }
 
@@ -48,7 +50,7 @@ func getChallengeString(authResponse AuthResponseType) string {
 func (c *AuthResponse) ToJson() []byte {
 	data, _ := json.Marshal(map[string]string{
 		"authResponse": getChallengeString(c.AuthResponse),
-		"token": *c.Token,
+		"token":        *c.Token,
 	})
 	return data
 }

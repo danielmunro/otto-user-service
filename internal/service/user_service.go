@@ -237,10 +237,12 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	user, err := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
 
 	if err != nil {
+		log.Print("error finding user :: ", err)
 		return createAuthFailedSessionResponse("auth failed")
 	}
 
 	if user.LastRefreshToken == "" {
+		log.Print("no available refresh tokens")
 		return createAuthFailedSessionResponse("no available refresh tokens")
 	}
 
