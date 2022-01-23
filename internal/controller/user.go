@@ -28,6 +28,7 @@ func GetUserByUUIDV1(w http.ResponseWriter, r *http.Request) {
 	userUuid := util.GetUuidFromPathSecondPosition(r.URL.Path)
 	user, err := service.CreateDefaultUserService().GetUserFromUuid(userUuid)
 	if err != nil {
+		log.Print("error getting user by uuid :: ", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
