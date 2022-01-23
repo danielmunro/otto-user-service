@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   title: Otto user service
-  version: 1.0
+  version: "1.0"
 paths:
   /user:
     post:
@@ -23,11 +23,11 @@ paths:
       summary: Update a username
       requestBody:
         description: user to update
-          required: true
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
       responses:
         '200':
           description: |-
@@ -249,7 +249,6 @@ components:
           format: uuid
         user:
           $ref: '#/components/schemas/User'
-          type: object
         password:
           type: string
         created:
@@ -277,7 +276,6 @@ components:
           type: string
           format: date-time
         visibility:
-          type: enum
           $ref: '#/components/schemas/Visibility'
     NewGroup:
       type: object
@@ -288,7 +286,6 @@ components:
         name:
           type: string
         visibility:
-          type: enum
           $ref: '#/components/schemas/Visibility'
     Membership:
       type: object
@@ -310,13 +307,10 @@ components:
           format: date-time
         user:
           $ref: '#/components/schemas/User'
-          type: object
         group:
           $ref: '#/components/schemas/Group'
-          type: object
         permission:
           $ref: '#/components/schemas/Permission'
-          type: object
     Visibility:
       type: string
       enum:
@@ -338,12 +332,10 @@ components:
       properties:
         user:
           $ref: '#/components/schemas/User'
-          type: object
         email:
           type: string
         verifiedStatus:
           $ref: '#/components/schemas/VerifiedStatus'
-          type: object
     VerifiedStatus:
       type: string
       enum:
@@ -356,7 +348,6 @@ components:
       properties:
         user:
           $ref: '#/components/schemas/User'
-          type: object
         token:
           type: string
     NewSession:
