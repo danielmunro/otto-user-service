@@ -110,7 +110,8 @@ func (s *UserService) UpdateUser(userModel *model.User) error {
 		return err
 	}
 	userEntity.UpdateUserProfileFromModel(userModel)
-	data, _ := json.Marshal(userModel)
+	userToProduce := mapper.MapUserEntityToModel(userEntity)
+	data, _ := json.Marshal(userToProduce)
 	s.userRepository.Save(userEntity)
 	topic := "users"
 	_ = s.kafkaWriter.Produce(
