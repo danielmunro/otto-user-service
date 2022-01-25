@@ -86,6 +86,13 @@ var routes = Routes{
 	},
 
 	{
+		"GetUserByUsernameV1",
+		strings.ToUpper("Get"),
+		"/user/{username}",
+		controller.GetUserByUsernameV1,
+	},
+
+	{
 		"CreateNewSession",
 		strings.ToUpper("Post"),
 		"/session",

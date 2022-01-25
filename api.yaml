@@ -52,6 +52,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+  /user/{username}:
+    get:
+      operationId: getUserByUsernameV1
+      summary: Get a user by username
+      parameters:
+        - in: path
+          name: username
+          description: a username
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |-
+            200 response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
   /session:
     post:
       operationId: createNewSesssion

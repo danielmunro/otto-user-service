@@ -5,6 +5,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/service"
 	"github.com/danielmunro/otto-user-service/internal/util"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -37,9 +38,11 @@ func GetUserByUUIDV1(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-// GetUserByUsernameV1 - Get a user
+// GetUserByUsernameV1 - Get a user by username
 func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
-	username := util.GetSecondPathParam(r.URL.Path)
+	params := mux.Vars(r)
+	username := params["username"]
+
 	user, err := service.CreateDefaultUserService().GetUserFromUsername(username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -48,6 +51,7 @@ func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	data, _ := json.Marshal(user)
 	_, _ = w.Write(data)
+
 }
 
 // UpdateUserV1 - Update a user
