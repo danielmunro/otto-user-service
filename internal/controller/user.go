@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/service"
-	"github.com/danielmunro/otto-user-service/internal/util"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -20,20 +19,6 @@ func CreateNewUserV1(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	data, _ := json.Marshal(user)
-	_, _ = w.Write(data)
-}
-
-// GetUserByUUIDV1 - Get a user
-func GetUserByUUIDV1(w http.ResponseWriter, r *http.Request) {
-	userUuid := util.GetUuidFromPathSecondPosition(r.URL.Path)
-	user, err := service.CreateDefaultUserService().GetUserFromUuid(userUuid)
-	if err != nil {
-		log.Print("error getting user by uuid :: ", err)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
 	data, _ := json.Marshal(user)
 	_, _ = w.Write(data)
 }

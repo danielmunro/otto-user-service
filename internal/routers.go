@@ -79,13 +79,6 @@ var routes = Routes{
 	},
 
 	{
-		"GetUserByUUIDV1",
-		strings.ToUpper("Get"),
-		"/user/{uuid}",
-		controller.GetUserByUUIDV1,
-	},
-
-	{
 		"GetUserByUsernameV1",
 		strings.ToUpper("Get"),
 		"/user/{username}",

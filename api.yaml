@@ -32,26 +32,6 @@ paths:
         '200':
           description: |-
             200 response
-  /user/{uuid}:
-    get:
-      operationId: getUserByUUIDV1
-      summary: Get a user by uuid
-      parameters:
-        - in: path
-          name: uuid
-          description: a user's unique ID
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: |-
-            200 response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
   /user/{username}:
     get:
       operationId: getUserByUsernameV1
