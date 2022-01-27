@@ -9,7 +9,7 @@ import (
 
 func GetReader() *kafka.Consumer {
 	log.Print(
-		fmt.Printf(
+		fmt.Sprintf(
 			"debug kafka reader :: %s %s %s %s %s",
 			os.Getenv("KAFKA_BOOTSTRAP_SERVERS"),
 			os.Getenv("KAFKA_SECURITY_PROTOCOL"),
