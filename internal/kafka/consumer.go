@@ -9,7 +9,6 @@ import (
 )
 
 func InitializeAndRunLoop() {
-
 	userRepository := repository.CreateUserRepository(db.CreateDefaultConnection())
 	err := loopKafkaReader(userRepository)
 	if err != nil {
