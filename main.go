@@ -6,7 +6,6 @@ package main
 
 import (
 	"github.com/danielmunro/otto-user-service/internal"
-	"github.com/danielmunro/otto-user-service/internal/kafka"
 	"github.com/danielmunro/otto-user-service/internal/middleware"
 	_ "github.com/joho/godotenv/autoload"
 	"log"
@@ -14,13 +13,7 @@ import (
 )
 
 func main() {
-	go serveHttp()
-	readKafka()
-}
-
-func readKafka() {
-	kafka.InitializeAndRunLoop()
-	log.Print("exit kafka loop")
+	serveHttp()
 }
 
 func serveHttp() {
