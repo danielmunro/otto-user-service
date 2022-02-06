@@ -44,8 +44,8 @@ func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
 	userModel := model.DecodeRequestToUser(r)
 	userService := service.CreateDefaultUserService()
 	sessionToken := model.DecodeRequestToSessionToken(r)
-	_, err := userService.GetSession(sessionToken)
-	if err != nil {
+	session, err := userService.GetSession(sessionToken)
+	if err != nil || session.User.Uuid != userModel.Uuid {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
