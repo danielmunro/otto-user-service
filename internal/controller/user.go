@@ -42,7 +42,14 @@ func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
 // UpdateUserV1 - Update a user
 func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
 	userModel := model.DecodeRequestToUser(r)
-	err := service.CreateDefaultUserService().UpdateUser(userModel)
+	userService := service.CreateDefaultUserService()
+	sessionToken := model.DecodeRequestToSessionToken(r)
+	_, err := userService.GetSession(sessionToken)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	err = userService.UpdateUser(userModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
