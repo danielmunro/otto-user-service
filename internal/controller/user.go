@@ -25,6 +25,7 @@ func CreateNewUserV1(w http.ResponseWriter, r *http.Request) {
 
 // GetUserByUsernameV1 - Get a user by username
 func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "max-age=30")
 	params := mux.Vars(r)
 	username := params["username"]
 

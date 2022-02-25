@@ -36,8 +36,8 @@ func CreateConnection(host string, port string, dbname string, user string, pass
 		}
 		dbConn = db
 		sqlConnection := dbConn.DB()
-		sqlConnection.SetMaxOpenConns(75)
-		sqlConnection.SetMaxIdleConns(10)
+		sqlConnection.SetMaxOpenConns(20)
+		sqlConnection.SetMaxIdleConns(5)
 		sqlConnection.SetConnMaxLifetime(time.Hour)
 	}
 	return dbConn
