@@ -16,7 +16,6 @@ import (
 )
 
 type User struct {
-
 	Uuid string `json:"uuid"`
 
 	Name string `json:"name,omitempty"`
@@ -30,6 +29,10 @@ type User struct {
 	CurrentEmail string `json:"current_email,omitempty"`
 
 	CurrentPassword string `json:"current_password,omitempty"`
+
+	Role Role `json:"role,omitempty"`
+
+	IsBanned bool `json:"is_banned,omitempty"`
 
 	Birthday string `json:"birthday,omitempty"`
 

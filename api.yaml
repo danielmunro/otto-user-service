@@ -171,6 +171,11 @@ components:
           format: email
         current_password:
           type: string
+        role:
+          $ref: "#/components/schemas/Role"
+        is_banned:
+          type: boolean
+          default: false
         birthday:
           type: string
           format: birthday
@@ -214,6 +219,8 @@ components:
         birthday:
           type: string
           format: birthday
+        role:
+          $ref: "#/components/schemas/Role"
         address_street:
           type: string
         address_city:
@@ -291,42 +298,11 @@ components:
           type: string
         visibility:
           $ref: '#/components/schemas/Visibility'
-    Membership:
-      type: object
-      required:
-        - uuid
-        - created
-        - user
-        - group
-        - permission
-      properties:
-        id:
-          type: integer
-          format: int64
-        uuid:
-          type: string
-          format: uuid
-        created:
-          type: string
-          format: date-time
-        user:
-          $ref: '#/components/schemas/User'
-        group:
-          $ref: '#/components/schemas/Group'
-        permission:
-          $ref: '#/components/schemas/Permission'
     Visibility:
       type: string
       enum:
         - public
         - private
-    Permission:
-      type: string
-      enum:
-        - read
-        - write
-        - moderate
-        - admin
     Email:
       type: object
       required:
@@ -372,3 +348,9 @@ components:
       properties:
         token:
           type: string
+    Role:
+      type: string
+      enum:
+        - user
+        - moderator
+        - admin

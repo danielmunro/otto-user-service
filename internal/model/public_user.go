@@ -1,11 +1,10 @@
 package model
 
 import (
-"time"
+	"time"
 )
 
 type PublicUser struct {
-
 	Uuid string `json:"uuid"`
 
 	Name string `json:"name"`
@@ -18,6 +17,8 @@ type PublicUser struct {
 
 	Birthday string `json:"birthday"`
 
+	Role Role `json:"role,omitempty"`
+
 	AddressStreet string `json:"address_street,omitempty"`
 
 	AddressCity string `json:"address_city,omitempty"`
@@ -26,4 +27,3 @@ type PublicUser struct {
 
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
-

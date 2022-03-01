@@ -14,6 +14,8 @@ func MapUserEntityToModel(user *entity.User) *model.User {
 		CurrentEmail:    user.CurrentEmail,
 		CurrentPassword: user.CurrentPassword,
 		ProfilePic:      user.ProfilePic,
+		Role:            model.Role(user.Role),
+		IsBanned:        user.IsBanned,
 		AddressCity:     user.AddressCity,
 		AddressStreet:   user.AddressStreet,
 		AddressZip:      user.AddressZip,
@@ -26,25 +28,26 @@ func MapUserEntityToModel(user *entity.User) *model.User {
 
 func MapUserEntityToPublicUser(user *entity.User) *model.PublicUser {
 	return &model.PublicUser{
-		Uuid:            user.Uuid.String(),
-		Name:            user.Name,
-		Username:        user.Username,
-		ProfilePic:      user.ProfilePic,
-		AddressCity:     user.AddressCity,
-		AddressStreet:   user.AddressStreet,
-		AddressZip:      user.AddressZip,
-		BioMessage:      user.BioMessage,
-		Birthday:        user.Birthday,
-		CreatedAt:       user.CreatedAt,
+		Uuid:          user.Uuid.String(),
+		Name:          user.Name,
+		Username:      user.Username,
+		ProfilePic:    user.ProfilePic,
+		Role:          model.Role(user.Role),
+		AddressCity:   user.AddressCity,
+		AddressStreet: user.AddressStreet,
+		AddressZip:    user.AddressZip,
+		BioMessage:    user.BioMessage,
+		Birthday:      user.Birthday,
+		CreatedAt:     user.CreatedAt,
 	}
 }
 
 func MapNewUserModelToEntity(user *model.NewUser, cognitoId uuid.UUID) *entity.User {
 	return &entity.User{
-		Name:      user.Name,
-		Username:  user.Username,
-		CurrentEmail: user.Email,
+		Name:            user.Name,
+		Username:        user.Username,
+		CurrentEmail:    user.Email,
 		CurrentPassword: user.Password,
-		CognitoId: cognitoId,
+		CognitoId:       cognitoId,
 	}
 }
