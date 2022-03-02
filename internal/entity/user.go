@@ -23,7 +23,7 @@ type User struct {
 	Username         string `gorm:"unique;not null"`
 	ProfilePic       string
 	BioMessage       string
-	Role             string `gorm:"default:user"`
+	Role             string `gorm:"default:'user'"`
 	IsBanned         bool   `gorm:"default:false"`
 	AddressStreet    string
 	AddressCity      string
