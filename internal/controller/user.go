@@ -44,8 +44,11 @@ func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
 func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
 	userModel := model.DecodeRequestToUser(r)
 	userService := service.CreateDefaultUserService()
-	sessionToken := model.DecodeRequestToSessionToken(r)
-	session, err := userService.GetSession(sessionToken)
+	sessionToken := getSessionToken(r)
+	sessionModel := &model.SessionToken{
+		Token: sessionToken,
+	}
+	session, err := userService.GetSession(sessionModel)
 	if err != nil || session.User.Uuid != userModel.Uuid {
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -58,4 +61,8 @@ func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	data, _ := json.Marshal(userModel)
 	_, _ = w.Write(data)
+}
+
+func getSessionToken(r *http.Request) string {
+	return r.Header.Get("x-session-token")
 }
