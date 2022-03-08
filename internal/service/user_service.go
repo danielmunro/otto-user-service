@@ -266,24 +266,35 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	return createSuccessfulRefreshResponse(result)
 }
 
-func (s *UserService) BanUser(username string) error {
-	user, err := s.userRepository.GetUserFromUsername(username)
-	if err != nil {
-		return err
+func (s *UserService) BanUser(sessionUser *entity.User, userEntity *entity.User) error {
+	if !s.canAdminister(sessionUser, userEntity) {
+		return errors.New("cannot ban user")
 	}
-	user.IsBanned = true
-	s.userRepository.Save(user)
+	userEntity.IsBanned = true
+	s.userRepository.Save(userEntity)
 	return nil
 }
 
-func (s *UserService) UnbanUser(username string) error {
-	user, err := s.userRepository.GetUserFromUsername(username)
-	if err != nil {
-		return err
+func (s *UserService) UnbanUser(sessionUser *entity.User, userEntity *entity.User) error {
+	if !s.canAdminister(sessionUser, userEntity) {
+		return errors.New("cannot ban user")
 	}
-	user.IsBanned = false
-	s.userRepository.Save(user)
+	userEntity.IsBanned = false
+	s.userRepository.Save(userEntity)
 	return nil
+}
+
+func (s *UserService) canAdminister(sessionUser *entity.User, user *entity.User) bool {
+	if sessionUser.IsBanned || sessionUser.Role == "user" {
+		return false
+	}
+	if user.Role == "moderator" {
+		return sessionUser.Role == "admin"
+	}
+	if user.Role == "admin" {
+		return false
+	}
+	return true
 }
 
 func (s *UserService) updateUserWithCreateSessionResult(user *entity.User, result *cognitoidentityprovider.AdminInitiateAuthOutput) {

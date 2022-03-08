@@ -2,7 +2,9 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/danielmunro/otto-user-service/internal/db"
 	"github.com/danielmunro/otto-user-service/internal/model"
+	"github.com/danielmunro/otto-user-service/internal/repository"
 	"github.com/danielmunro/otto-user-service/internal/service"
 	"github.com/gorilla/mux"
 	"log"
@@ -67,7 +69,28 @@ func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
 func BanUserV1(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	usernameParam := params["username"]
-	err := service.CreateDefaultUserService().BanUser(usernameParam)
+	userService := service.CreateDefaultUserService()
+	userRepository := repository.CreateUserRepository(db.CreateDefaultConnection())
+	sessionToken := getSessionToken(r)
+	sessionModel := &model.SessionToken{
+		Token: sessionToken,
+	}
+	session, err := userService.GetSession(sessionModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionUser, err := userRepository.GetUserFromUsername(session.User.Username)
+	if err != nil || sessionUser.IsBanned {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	userEntity, err := userRepository.GetUserFromUsername(usernameParam)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = userService.BanUser(sessionUser, userEntity)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
@@ -77,7 +100,28 @@ func BanUserV1(w http.ResponseWriter, r *http.Request) {
 func UnbanUserV1(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	usernameParam := params["username"]
-	err := service.CreateDefaultUserService().UnbanUser(usernameParam)
+	userService := service.CreateDefaultUserService()
+	userRepository := repository.CreateUserRepository(db.CreateDefaultConnection())
+	sessionToken := getSessionToken(r)
+	sessionModel := &model.SessionToken{
+		Token: sessionToken,
+	}
+	session, err := userService.GetSession(sessionModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionUser, err := userRepository.GetUserFromUsername(session.User.Username)
+	if err != nil || sessionUser.IsBanned {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	userEntity, err := userRepository.GetUserFromUsername(usernameParam)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = userService.UnbanUser(sessionUser, userEntity)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
