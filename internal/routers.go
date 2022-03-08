@@ -51,6 +51,13 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 var routes = Routes{
 	{
+		"BanUserV1",
+		strings.ToUpper("Post"),
+		"/ban/{username}",
+		controller.BanUserV1,
+	},
+
+	{
 		"Index",
 		"GET",
 		"/",
@@ -111,6 +118,13 @@ var routes = Routes{
 		strings.ToUpper("Patch"),
 		"/session",
 		controller.RefreshSessionV1,
+	},
+
+	{
+		"UnbanUserV1",
+		strings.ToUpper("Delete"),
+		"/ban/{username}",
+		controller.UnbanUserV1,
 	},
 
 	{

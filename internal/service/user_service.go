@@ -266,6 +266,26 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	return createSuccessfulRefreshResponse(result)
 }
 
+func (s *UserService) BanUser(username string) error {
+	user, err := s.userRepository.GetUserFromUsername(username)
+	if err != nil {
+		return err
+	}
+	user.IsBanned = true
+	s.userRepository.Save(user)
+	return nil
+}
+
+func (s *UserService) UnbanUser(username string) error {
+	user, err := s.userRepository.GetUserFromUsername(username)
+	if err != nil {
+		return err
+	}
+	user.IsBanned = false
+	s.userRepository.Save(user)
+	return nil
+}
+
 func (s *UserService) updateUserWithCreateSessionResult(user *entity.User, result *cognitoidentityprovider.AdminInitiateAuthOutput) {
 	user.SRP = *result.ChallengeParameters["USER_ID_FOR_SRP"]
 	user.LastSessionToken = *result.Session

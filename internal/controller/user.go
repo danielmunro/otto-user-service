@@ -63,6 +63,26 @@ func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
+// BanUserV1 - ban a user
+func BanUserV1(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	usernameParam := params["username"]
+	err := service.CreateDefaultUserService().BanUser(usernameParam)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
+// UnbanUserV1 - ban a user
+func UnbanUserV1(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	usernameParam := params["username"]
+	err := service.CreateDefaultUserService().UnbanUser(usernameParam)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
 func getSessionToken(r *http.Request) string {
 	return r.Header.Get("x-session-token")
 }

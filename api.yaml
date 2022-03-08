@@ -139,6 +139,35 @@ paths:
         '201':
           description: |-
             201 response
+  /ban/{username}:
+    post:
+      operationId: banUserV1
+      summary: ban a user
+      parameters:
+        - in: path
+          name: username
+          description: a username
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: |-
+            201 user banned
+    delete:
+      operationId: unbanUserV1
+      summary: unban a user
+      parameters:
+        - in: path
+          name: username
+          description: a username
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: |-
+            201 user unbanned
 components:
   schemas:
     User:
