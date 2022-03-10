@@ -77,21 +77,26 @@ func BanUserV1(w http.ResponseWriter, r *http.Request) {
 	}
 	session, err := userService.GetSession(sessionModel)
 	if err != nil {
+		log.Print("error 0 :: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	sessionUser, err := userRepository.GetUserFromUsername(session.User.Username)
 	if err != nil || sessionUser.IsBanned {
+		log.Print("error 1 :: ", err.Error())
+		log.Print("sessionUser isBanned :: ", sessionUser.IsBanned)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	userEntity, err := userRepository.GetUserFromUsername(usernameParam)
 	if err != nil {
+		log.Print("error 2 :: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	err = userService.BanUser(sessionUser, userEntity)
 	if err != nil {
+		log.Print("error 3 :: ", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 	}
 }
