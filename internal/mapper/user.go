@@ -32,6 +32,7 @@ func MapUserEntityToPublicUser(user *entity.User) *model.PublicUser {
 		Name:          user.Name,
 		Username:      user.Username,
 		ProfilePic:    user.ProfilePic,
+		IsBanned:      user.IsBanned,
 		Role:          model.Role(user.Role),
 		AddressCity:   user.AddressCity,
 		AddressStreet: user.AddressStreet,

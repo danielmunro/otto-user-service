@@ -19,6 +19,8 @@ type PublicUser struct {
 
 	Role Role `json:"role,omitempty"`
 
+	IsBanned bool `json:"is_banned,omitempty"`
+
 	AddressStreet string `json:"address_street,omitempty"`
 
 	AddressCity string `json:"address_city,omitempty"`
