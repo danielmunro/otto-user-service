@@ -88,16 +88,7 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.User.Attributes[0].Value))
 	s.userRepository.Create(user)
 	userModel := mapper.MapUserEntityToModel(user)
-	userData, _ := json.Marshal(userModel)
-	log.Print("publishing user to kafka: ", string(userData))
-	topic := "users"
-	err = s.kafkaWriter.Produce(
-		&kafka.Message{
-			Value: userData,
-			TopicPartition: kafka.TopicPartition{Topic: &topic,
-				Partition: kafka.PartitionAny},
-		},
-		nil)
+	err = s.publishUserToKafka(user)
 	if err != nil {
 		log.Print(err)
 	}
@@ -110,17 +101,8 @@ func (s *UserService) UpdateUser(userModel *model.User) error {
 		return err
 	}
 	userEntity.UpdateUserProfileFromModel(userModel)
-	userToProduce := mapper.MapUserEntityToModel(userEntity)
-	data, _ := json.Marshal(userToProduce)
 	s.userRepository.Save(userEntity)
-	topic := "users"
-	_ = s.kafkaWriter.Produce(
-		&kafka.Message{
-			Value: data,
-			TopicPartition: kafka.TopicPartition{Topic: &topic,
-				Partition: kafka.PartitionAny},
-		},
-		nil)
+	_ = s.publishUserToKafka(userEntity)
 	return nil
 }
 
@@ -272,6 +254,7 @@ func (s *UserService) BanUser(sessionUser *entity.User, userEntity *entity.User)
 	}
 	userEntity.IsBanned = true
 	s.userRepository.Save(userEntity)
+	_ = s.publishUserToKafka(userEntity)
 	return nil
 }
 
@@ -281,7 +264,21 @@ func (s *UserService) UnbanUser(sessionUser *entity.User, userEntity *entity.Use
 	}
 	userEntity.IsBanned = false
 	s.userRepository.Save(userEntity)
+	_ = s.publishUserToKafka(userEntity)
 	return nil
+}
+
+func (s *UserService) publishUserToKafka(userEntity *entity.User) error {
+	topic := "users"
+	userModel := mapper.MapUserEntityToModel(userEntity)
+	userData, _ := json.Marshal(userModel)
+	return s.kafkaWriter.Produce(
+		&kafka.Message{
+			Value: userData,
+			TopicPartition: kafka.TopicPartition{Topic: &topic,
+				Partition: kafka.PartitionAny},
+		},
+		nil)
 }
 
 func (s *UserService) canAdminister(sessionUser *entity.User, user *entity.User) bool {
