@@ -12,6 +12,9 @@ spec:
   owner: dev-team
   definition:
     $text: https://github.com/danielmunro/otto-user-service/blob/main/api.yaml
+  dependsOn:
+    - resource:user-service-db
+    - resource:aws-cognito
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
