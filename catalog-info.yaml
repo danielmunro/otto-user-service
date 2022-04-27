@@ -16,6 +16,9 @@ spec:
     - resource:user-service-db
     - resource:aws-cognito
     - resource:kafka
+  dependencyOf:
+    - component:image-service
+    - component:community-service
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Resource
