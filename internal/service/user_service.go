@@ -118,6 +118,7 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 	})
 
 	if err != nil {
+		log.Print("login failed", err.Error())
 		return createAuthFailedSessionResponse("auth failed")
 	}
 
