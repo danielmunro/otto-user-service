@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: user-service-kafka
-          image: ghcr.io/danielmunro/otto-user-service:kafka-latest
+          image: ghcr.io/danielmunro/otto-user-service:kafka-v0.1
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
