@@ -49,3 +49,13 @@ func RefreshSessionV1(w http.ResponseWriter, r *http.Request) {
 	response := service.CreateDefaultUserService().RefreshSession(sessionToken)
 	_, _ = w.Write(response.ToJson())
 }
+
+// DeleteSessionV1 - Delete a user's session (log out)
+func DeleteSessionV1(w http.ResponseWriter, r *http.Request) {
+	sessionToken := model.DecodeRequestToSessionToken(r)
+	err := service.CreateDefaultUserService().DeleteSession(sessionToken)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+}

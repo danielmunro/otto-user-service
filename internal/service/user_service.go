@@ -249,6 +249,16 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 	return createSuccessfulRefreshResponse(result)
 }
 
+func (s *UserService) DeleteSession(sessionToken *model.SessionToken) error {
+	_, err := s.cognito.GlobalSignOut(&cognitoidentityprovider.GlobalSignOutInput{
+		AccessToken: &sessionToken.Token,
+	})
+	if err != nil {
+		return errors.New("something failed")
+	}
+	return nil
+}
+
 func (s *UserService) BanUser(sessionUser *entity.User, userEntity *entity.User) error {
 	if !s.canAdminister(sessionUser, userEntity) {
 		return errors.New("cannot ban user")
