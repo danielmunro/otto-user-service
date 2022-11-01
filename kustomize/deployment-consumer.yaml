@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service-kafka
+  name: user-service-consumer
 spec:
   minReadySeconds: 3
   revisionHistoryLimit: 5
@@ -12,18 +12,18 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: user-service-kafka
+      app: user-service-consumer
   template:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9797"
       labels:
-        app: user-service-kafka
+        app: user-service-consumer
     spec:
       containers:
-        - name: user-service-kafka
-          image: ghcr.io/danielmunro/otto-user-service:kafka-v0.1
+        - name: user-service-consumer
+          image: ghcr.io/danielmunro/otto-user-service-consumer:v0.1.1
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
