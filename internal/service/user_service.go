@@ -31,7 +31,7 @@ type UserService struct {
 	kafkaWriter         *kafka.Producer
 }
 
-const AuthFlowAdminNoSRP = "ADMIN_NO_SRP_AUTH"
+const UserPasswordAuth = "USER_PASSWORD_AUTH"
 const AuthFlowRefreshToken = "REFRESH_TOKEN_AUTH"
 const AuthResponseChallenge = "NEW_PASSWORD_REQUIRED"
 const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
@@ -75,17 +75,17 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 }
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
-	response, err := s.cognito.AdminCreateUser(&cognitoidentityprovider.AdminCreateUserInput{
-		Username:          aws.String(newUser.Email),
-		TemporaryPassword: aws.String(newUser.Password),
-		UserPoolId:        aws.String(s.cognitoUserPool),
+	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
+		Username: aws.String(newUser.Email),
+		Password: aws.String(newUser.Password),
+		ClientId: aws.String(s.cognitoClientID),
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.User.Attributes[0].Value))
+	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.UserSub))
 	s.userRepository.Create(user)
 	userModel := mapper.MapUserEntityToModel(user)
 	err = s.publishUserToKafka(user)
@@ -107,14 +107,13 @@ func (s *UserService) UpdateUser(userModel *model.User) error {
 }
 
 func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse {
-	response, err := s.cognito.AdminInitiateAuth(&cognitoidentityprovider.AdminInitiateAuthInput{
-		AuthFlow: aws.String(AuthFlowAdminNoSRP),
+	response, err := s.cognito.InitiateAuth(&cognitoidentityprovider.InitiateAuthInput{
+		AuthFlow: aws.String(UserPasswordAuth),
 		AuthParameters: map[string]*string{
 			"USERNAME": aws.String(newSession.Email),
 			"PASSWORD": aws.String(newSession.Password),
 		},
-		ClientId:   aws.String(s.cognitoClientID),
-		UserPoolId: aws.String(s.cognitoUserPool),
+		ClientId: aws.String(s.cognitoClientID),
 	})
 
 	if err != nil {
@@ -149,18 +148,17 @@ func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordRese
 
 	log.Print("requesting reset with: ", passwordReset.Email, ", session: ", user.LastSessionToken)
 
-	data := &cognitoidentityprovider.AdminRespondToAuthChallengeInput{
+	data := &cognitoidentityprovider.RespondToAuthChallengeInput{
 		ChallengeName: aws.String(AuthResponseChallenge),
 		ChallengeResponses: map[string]*string{
 			"USERNAME":     aws.String(passwordReset.Email),
 			"NEW_PASSWORD": aws.String(passwordReset.Password),
 		},
-		ClientId:   aws.String(s.cognitoClientID),
-		Session:    aws.String(user.LastSessionToken),
-		UserPoolId: aws.String(s.cognitoUserPool),
+		ClientId: aws.String(s.cognitoClientID),
+		Session:  aws.String(user.LastSessionToken),
 	}
 
-	response, err := s.cognito.AdminRespondToAuthChallenge(data)
+	response, err := s.cognito.RespondToAuthChallenge(data)
 
 	if err != nil {
 		log.Print("error responding to auth challenge: ", err)
@@ -230,14 +228,13 @@ func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *Auth
 		return createAuthFailedSessionResponse("no available refresh tokens")
 	}
 
-	result, err := s.cognito.AdminInitiateAuth(&cognitoidentityprovider.AdminInitiateAuthInput{
+	result, err := s.cognito.InitiateAuth(&cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String(AuthFlowRefreshToken),
 		AuthParameters: map[string]*string{
 			"REFRESH_TOKEN": aws.String(user.LastRefreshToken),
 			"DEVICE_KEY":    aws.String(user.DeviceKey),
 		},
-		ClientId:   aws.String(s.cognitoClientID),
-		UserPoolId: aws.String(s.cognitoUserPool),
+		ClientId: aws.String(s.cognitoClientID),
 	})
 
 	if err != nil {
@@ -305,7 +302,7 @@ func (s *UserService) canAdminister(sessionUser *entity.User, user *entity.User)
 	return true
 }
 
-func (s *UserService) updateUserWithCreateSessionResult(user *entity.User, result *cognitoidentityprovider.AdminInitiateAuthOutput) {
+func (s *UserService) updateUserWithCreateSessionResult(user *entity.User, result *cognitoidentityprovider.InitiateAuthOutput) {
 	user.SRP = *result.ChallengeParameters["USER_ID_FOR_SRP"]
 	user.LastSessionToken = *result.Session
 	s.userRepository.Save(user)

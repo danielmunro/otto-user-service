@@ -8,9 +8,9 @@ import (
 type AuthResponseType int
 
 const (
-	Unknown              		AuthResponseType = iota + 1
-	ChallengeNewPassword 		AuthResponseType = iota
-	SessionAuthenticated 	    AuthResponseType = iota
+	Unknown                     AuthResponseType = iota + 1
+	ChallengeNewPassword        AuthResponseType = iota
+	SessionAuthenticated        AuthResponseType = iota
 	SessionFailedAuthentication AuthResponseType = iota
 )
 
@@ -21,7 +21,7 @@ type AuthResponse struct {
 	Message      string
 }
 
-func createSuccessfulRefreshResponse(response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
+func createSuccessfulRefreshResponse(response *cognitoidentityprovider.InitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		AuthResponse: SessionAuthenticated,
 		Token:        response.AuthenticationResult.AccessToken,

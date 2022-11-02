@@ -16,14 +16,14 @@ func getAuthResponseFromChallenge(response string) AuthResponseType {
 	return Unknown
 }
 
-func createSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
+func createSessionResponse(user *entity.User, response *cognitoidentityprovider.InitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		Token: response.AuthenticationResult.AccessToken,
 		User:  mapper.MapUserEntityToPublicUser(user),
 	}
 }
 
-func createChallengeSessionResponse(user *entity.User, response *cognitoidentityprovider.AdminInitiateAuthOutput) *AuthResponse {
+func createChallengeSessionResponse(user *entity.User, response *cognitoidentityprovider.InitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		AuthResponse: getAuthResponseFromChallenge(*response.ChallengeName),
 		Token:        response.Session,
