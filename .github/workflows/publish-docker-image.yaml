@@ -12,8 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
       - run: go vet ./...
-      - run: |
-          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u danielmunro --password-stdin
+      - run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u danielmunro --password-stdin
       - run: docker build -t ghcr.io/danielmunro/otto-user-service:${{ github.ref_name }} .
       - run: docker push ghcr.io/danielmunro/otto-user-service:${{ github.ref_name }}
       - run: mv ./cmd/kafka/main.go .
