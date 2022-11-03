@@ -277,10 +277,10 @@ func (s *UserService) UnbanUser(sessionUser *entity.User, userEntity *entity.Use
 }
 
 func (s *UserService) SubmitOTP(otp *model.Otp) error {
-	log.Print("otp with values :: ", otp.Code, otp.User.Username)
 	_, err := s.cognito.ConfirmSignUp(&cognitoidentityprovider.ConfirmSignUpInput{
-		ConfirmationCode: &otp.Code,
-		Username:         &otp.User.Username,
+		ConfirmationCode: aws.String(otp.Code),
+		Username:         aws.String(otp.User.Username),
+		ClientId:         aws.String(s.cognitoClientID),
 	})
 	if err != nil {
 		log.Print("err with OTP :: ", err.Error())
