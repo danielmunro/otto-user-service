@@ -45,10 +45,9 @@ func MapUserEntityToPublicUser(user *entity.User) *model.PublicUser {
 
 func MapNewUserModelToEntity(user *model.NewUser, cognitoId uuid.UUID) *entity.User {
 	return &entity.User{
-		Name:            user.Name,
-		Username:        user.Username,
-		CurrentEmail:    user.Email,
-		CurrentPassword: user.Password,
-		CognitoId:       cognitoId,
+		Name:         user.Name,
+		Username:     user.Username,
+		CurrentEmail: user.Email,
+		CognitoId:    cognitoId,
 	}
 }
