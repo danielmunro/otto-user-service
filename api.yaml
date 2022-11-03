@@ -124,6 +124,20 @@ paths:
       responses:
         '200':
           description: 200 response
+  /otp:
+    post:
+      operationId: submitOTPV1
+      summary: Submit a new OTP
+      requestBody:
+        description: OTP to submit
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OTP"
+      responses:
+        '200':
+          description: 200 submitted
   /group:
     get:
       operationId: getGroupV1
@@ -305,6 +319,13 @@ components:
         created:
           type: string
           format: date-time
+    OTP:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        code:
+          type: string
     Group:
       type: object
       required:

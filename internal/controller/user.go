@@ -132,6 +132,17 @@ func UnbanUserV1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// SubmitOTPV1 - Submit a new OTP
+func SubmitOTPV1(w http.ResponseWriter, r *http.Request) {
+	otpModel := model.DecodeRequestToOtp(r)
+	userService := service.CreateDefaultUserService()
+	err := userService.SubmitOTP(otpModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+}
+
 func getSessionToken(r *http.Request) string {
 	return r.Header.Get("x-session-token")
 }

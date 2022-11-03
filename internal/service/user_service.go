@@ -276,6 +276,18 @@ func (s *UserService) UnbanUser(sessionUser *entity.User, userEntity *entity.Use
 	return nil
 }
 
+func (s *UserService) SubmitOTP(otp *model.Otp) error {
+	userEntity, err := s.userRepository.GetUserFromUuid(uuid.MustParse(otp.User.Uuid))
+	if err != nil {
+		return err
+	}
+	_, err = s.cognito.ConfirmSignUp(&cognitoidentityprovider.ConfirmSignUpInput{
+		ConfirmationCode: &otp.Code,
+		Username:         &userEntity.Username,
+	})
+	return err
+}
+
 func (s *UserService) publishUserToKafka(userEntity *entity.User) error {
 	topic := "users"
 	userModel := mapper.MapUserEntityToModel(userEntity)

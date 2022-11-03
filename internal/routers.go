@@ -107,6 +107,13 @@ var routes = Routes{
 	},
 
 	{
+		"SubmitOTPV1",
+		strings.ToUpper("Post"),
+		"/otp",
+		controller.SubmitOTPV1,
+	},
+
+	{
 		"GetSession",
 		strings.ToUpper("Get"),
 		"/session",
