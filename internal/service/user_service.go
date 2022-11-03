@@ -277,13 +277,9 @@ func (s *UserService) UnbanUser(sessionUser *entity.User, userEntity *entity.Use
 }
 
 func (s *UserService) SubmitOTP(otp *model.Otp) error {
-	userEntity, err := s.userRepository.GetUserFromUuid(uuid.MustParse(otp.User.Uuid))
-	if err != nil {
-		return err
-	}
-	_, err = s.cognito.ConfirmSignUp(&cognitoidentityprovider.ConfirmSignUpInput{
+	_, err := s.cognito.ConfirmSignUp(&cognitoidentityprovider.ConfirmSignUpInput{
 		ConfirmationCode: &otp.Code,
-		Username:         &userEntity.Username,
+		Username:         &otp.User.Username,
 	})
 	return err
 }
