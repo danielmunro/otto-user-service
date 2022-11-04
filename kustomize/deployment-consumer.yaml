@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: user-service-consumer
-          image: ghcr.io/danielmunro/otto-user-service-consumer:v0.1.11
+          image: ghcr.io/danielmunro/otto-user-service-consumer:v0.1.12
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
