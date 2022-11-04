@@ -58,6 +58,13 @@ var routes = Routes{
 	},
 
 	{
+		"ConfirmForgotPasswordV1",
+		strings.ToUpper("Put"),
+		"/forgot-password",
+		controller.ConfirmForgotPasswordV1,
+	},
+
+	{
 		"Index",
 		"GET",
 		"/",

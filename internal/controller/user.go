@@ -152,6 +152,16 @@ func SubmitForgotPasswordV1(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ConfirmForgotPasswordV1 - Submit a forgot password request
+func ConfirmForgotPasswordV1(w http.ResponseWriter, r *http.Request) {
+	userModel := model.DecodeRequestToUser(r)
+	userService := service.CreateDefaultUserService()
+	err := userService.ForgotPassword(userModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
 func getSessionToken(r *http.Request) string {
 	return r.Header.Get("x-session-token")
 }

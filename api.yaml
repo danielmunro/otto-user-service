@@ -152,6 +152,19 @@ paths:
       responses:
         '200':
           description: 200 submitted
+    put:
+      operationId: confirmForgotPasswordV1
+      summary: Confirm a forgotten password
+      requestBody:
+        description: User to reset
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: 200 submitted
   /group:
     get:
       operationId: getGroupV1
