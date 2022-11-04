@@ -161,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/OTP"
       responses:
         '200':
           description: 200 submitted

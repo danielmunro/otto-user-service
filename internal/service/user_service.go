@@ -299,11 +299,12 @@ func (s *UserService) ForgotPassword(user *model.User) error {
 	return err
 }
 
-func (s *UserService) ConfirmForgotPassword(user *model.User) error {
+func (s *UserService) ConfirmForgotPassword(otp *model.Otp) error {
 	_, err := s.cognito.ConfirmForgotPassword(&cognitoidentityprovider.ConfirmForgotPasswordInput{
-		Username: aws.String(user.Username),
-		Password: aws.String(user.CurrentPassword),
-		ClientId: aws.String(s.cognitoClientID),
+		Username:         aws.String(otp.User.Username),
+		Password:         aws.String(otp.User.CurrentPassword),
+		ClientId:         aws.String(s.cognitoClientID),
+		ConfirmationCode: aws.String(otp.Code),
 	})
 	if err != nil {
 		log.Print("err with forgot password :: ", err.Error())
