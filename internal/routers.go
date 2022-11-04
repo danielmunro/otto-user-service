@@ -107,6 +107,13 @@ var routes = Routes{
 	},
 
 	{
+		"SubmitForgotPassword",
+		strings.ToUpper("Post"),
+		"/forgot-password",
+		controller.SubmitForgotPasswordV1,
+	},
+
+	{
 		"SubmitOTPV1",
 		strings.ToUpper("Post"),
 		"/otp",

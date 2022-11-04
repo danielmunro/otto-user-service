@@ -288,6 +288,17 @@ func (s *UserService) SubmitOTP(otp *model.Otp) error {
 	return err
 }
 
+func (s *UserService) ForgotPassword(user *model.User) error {
+	_, err := s.cognito.ForgotPassword(&cognitoidentityprovider.ForgotPasswordInput{
+		Username: aws.String(user.Username),
+		ClientId: aws.String(s.cognitoClientID),
+	})
+	if err != nil {
+		log.Print("err with forgot password :: ", err.Error())
+	}
+	return err
+}
+
 func (s *UserService) publishUserToKafka(userEntity *entity.User) error {
 	topic := "users"
 	userModel := mapper.MapUserEntityToModel(userEntity)

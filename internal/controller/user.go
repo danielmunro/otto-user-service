@@ -139,7 +139,16 @@ func SubmitOTPV1(w http.ResponseWriter, r *http.Request) {
 	err := userService.SubmitOTP(otpModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		return
+	}
+}
+
+// SubmitForgotPasswordV1 - Submit a forgot password request
+func SubmitForgotPasswordV1(w http.ResponseWriter, r *http.Request) {
+	userModel := model.DecodeRequestToUser(r)
+	userService := service.CreateDefaultUserService()
+	err := userService.ForgotPassword(userModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 

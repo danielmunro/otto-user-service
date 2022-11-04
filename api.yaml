@@ -138,6 +138,20 @@ paths:
       responses:
         '200':
           description: 200 submitted
+  /forgot-password:
+    post:
+      operationId: submitForgotPasswordV1
+      summary: Submit a forgot password request
+      requestBody:
+        description: User whose password needs to be reset
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: 200 submitted
   /group:
     get:
       operationId: getGroupV1
