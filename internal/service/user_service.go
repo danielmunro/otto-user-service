@@ -84,16 +84,20 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	invite, err := s.inviteRepository.FindOneByCode(newUser.InviteCode)
-	if err != nil || invite.Claimed == true {
-		log.Print("error finding unclaimed invite :: ", err)
-		return nil, err
+	if err != nil {
+		log.Print("error finding invite :: ", err)
+		return nil, errors.New("invite not found")
+	}
+	if invite.Claimed {
+		log.Print("attempting to use a claimed invite :: ", newUser.Email, newUser.InviteCode)
+		return nil, errors.New("attempting to use a claimed invite code")
 	}
 	user := mapper.MapNewUserModelToEntity(newUser)
 	user.InviteID = invite.ID
 	result := s.userRepository.Create(user)
 	if result.Error != nil {
 		log.Print("error creating user record :: ", result.Error)
-		return nil, result.Error
+		return nil, errors.New("error creating user")
 	}
 	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
 		Username: aws.String(newUser.Email),
@@ -103,7 +107,7 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	if err != nil {
 		log.Print("error creating cognito user :: ", err)
 		s.userRepository.Delete(user)
-		return nil, err
+		return nil, errors.New("error creating user")
 	}
 	invite.Claimed = true
 	s.inviteRepository.Save(invite)
