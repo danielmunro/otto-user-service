@@ -75,18 +75,19 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 }
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
+	user := mapper.MapNewUserModelToEntity(newUser)
+	s.userRepository.Create(user)
 	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
 		Username: aws.String(newUser.Email),
 		Password: aws.String(newUser.Password),
 		ClientId: aws.String(s.cognitoClientID),
 	})
-
 	if err != nil {
+		s.userRepository.Delete(user)
 		return nil, err
 	}
-
-	user := mapper.MapNewUserModelToEntity(newUser, uuid.MustParse(*response.UserSub))
-	s.userRepository.Create(user)
+	user.CognitoId = uuid.MustParse(*response.UserSub)
+	s.userRepository.Save(user)
 	userModel := mapper.MapUserEntityToModel(user)
 	err = s.publishUserToKafka(user)
 	if err != nil {

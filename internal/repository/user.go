@@ -55,6 +55,10 @@ func (r *UserRepository) Create(user *entity.User) {
 	r.conn.Create(user)
 }
 
+func (r *UserRepository) Delete(user *entity.User) {
+	r.conn.Delete(user)
+}
+
 func (r *UserRepository) Save(user *entity.User) {
 	r.conn.Save(user)
 }

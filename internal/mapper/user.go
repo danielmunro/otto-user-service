@@ -3,7 +3,6 @@ package mapper
 import (
 	"github.com/danielmunro/otto-user-service/internal/entity"
 	"github.com/danielmunro/otto-user-service/internal/model"
-	"github.com/google/uuid"
 )
 
 func MapUserEntityToModel(user *entity.User) *model.User {
@@ -43,11 +42,10 @@ func MapUserEntityToPublicUser(user *entity.User) *model.PublicUser {
 	}
 }
 
-func MapNewUserModelToEntity(user *model.NewUser, cognitoId uuid.UUID) *entity.User {
+func MapNewUserModelToEntity(user *model.NewUser) *entity.User {
 	return &entity.User{
 		Name:         user.Name,
 		Username:     user.Username,
 		CurrentEmail: user.Email,
-		CognitoId:    cognitoId,
 	}
 }
