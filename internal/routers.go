@@ -100,6 +100,13 @@ var routes = Routes{
 	},
 
 	{
+		"GetInvitesV1",
+		strings.ToUpper("Get"),
+		"/invite",
+		controller.GetInvitesV1,
+	},
+
+	{
 		"GetUserByUsernameV1",
 		strings.ToUpper("Get"),
 		"/user/{username}",

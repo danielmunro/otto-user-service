@@ -14,6 +14,17 @@ func CreateInviteRepository(conn *gorm.DB) *InviteRepository {
 	return &InviteRepository{conn}
 }
 
+func (r *InviteRepository) FindInvites(offset int) []*entity.Invite {
+	var invites []*entity.Invite
+	r.conn.Table("invites").
+		Where("invites.deleted_at IS NULL").
+		Order("id desc").
+		Limit(25).
+		Offset(offset).
+		Find(&invites)
+	return invites
+}
+
 func (r *InviteRepository) FindOneByCode(code string) (*entity.Invite, error) {
 	invite := &entity.Invite{}
 	r.conn.Where("code = ?", code).Find(invite)

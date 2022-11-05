@@ -6,6 +6,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/service"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -51,13 +52,31 @@ func CreateInviteV1(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
+// GetInvitesV1 -- get a list of invites
+func GetInvitesV1(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	offset := 0
+	if query.Has("offset") {
+		offset, err := strconv.Atoi(query.Get("offset"))
+		if err != nil || offset < 0 || offset > 100 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
+	userService := service.CreateDefaultUserService()
+	invites := userService.GetInvites(offset)
+	data, _ := json.Marshal(invites)
+	_, _ = w.Write(data)
+}
+
 func generateCode() string {
-	b := make([]rune, 3)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+	l := make([]rune, 3)
+	n := make([]rune, 3)
+	for i := range l {
+		l[i] = letters[rand.Intn(len(letters))]
 	}
-	for i := range b {
-		b[i] = numbers[rand.Intn(len(letters))]
+	for i := range n {
+		n[i] = numbers[rand.Intn(len(numbers))]
 	}
-	return string(b)
+	return string(l) + "-" + string(n)
 }

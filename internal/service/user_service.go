@@ -329,6 +329,11 @@ func (s *UserService) ConfirmForgotPassword(otp *model.Otp) error {
 	return err
 }
 
+func (s *UserService) GetInvites(offset int) []*model.Invite {
+	invites := s.inviteRepository.FindInvites(offset)
+	return mapper.MapInviteEntitiesToModels(invites)
+}
+
 func (s *UserService) GetInvite(code string) (*model.Invite, error) {
 	invite, err := s.inviteRepository.FindOneByCode(code)
 	if err != nil {

@@ -176,6 +176,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Invite"
+    get:
+      operationId: getInvitesV1
+      summary: get invites
+      parameters:
+        - in: query
+          name: offset
+          description: a number, offset from beginning
+          schema:
+            type: string
+      responses:
+        '200':
+          description: a list of invites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invite'
   /group:
     get:
       operationId: getGroupV1

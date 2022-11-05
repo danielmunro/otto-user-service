@@ -10,5 +10,6 @@
 package model
 
 type Invite struct {
-	Code string `json:"code"`
+	Code    string `json:"code"`
+	Claimed bool   `json:"claimed"`
 }
