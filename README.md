@@ -51,6 +51,10 @@ Generating models:
 ./bin/swagger-generate-models
 ```
 
+## Sign Up Flow
+
+![Sign up flow](https://github.com/danielmunro/otto-user-service/blob/main/ref/sign-up.png?raw=true)
+
 ## Todo
 
 * better error handling
@@ -58,4 +62,6 @@ Generating models:
 * related entities (email, password)
 * versioned docs
 * recruit contributors
+* security audit
+* more diagrams
 
