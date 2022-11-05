@@ -56,8 +56,8 @@ func CreateInviteV1(w http.ResponseWriter, r *http.Request) {
 func GetInvitesV1(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	offset := 0
-	if query.Has("offset") {
-		offset, err := strconv.Atoi(query.Get("offset"))
+	if value := query.Get("offset"); value != "" {
+		offset, err := strconv.Atoi(value)
 		if err != nil || offset < 0 || offset > 100 {
 			w.WriteHeader(http.StatusBadRequest)
 			return
