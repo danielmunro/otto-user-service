@@ -37,3 +37,7 @@ func (r *InviteRepository) FindOneByCode(code string) (*entity.Invite, error) {
 func (r *InviteRepository) Create(invite *entity.Invite) *gorm.DB {
 	return r.conn.Create(invite)
 }
+
+func (r *InviteRepository) Save(invite *entity.Invite) *gorm.DB {
+	return r.conn.Save(invite)
+}

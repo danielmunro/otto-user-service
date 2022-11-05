@@ -5,7 +5,6 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -32,20 +31,9 @@ type User struct {
 	CurrentPassword  string `gorm:"not null"`
 	Birthday         string
 	Verified         bool `gorm:"not null"`
+	InviteID         uint
 	Emails           []*Email
 	Passwords        []*Password
-}
-
-func CreateUser(newUser *model.NewUser, cognitoId string) *User {
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
-	return &User{
-		CurrentEmail:    newUser.Email,
-		CurrentPassword: string(hashedPassword),
-		CognitoId:       uuid.MustParse(cognitoId),
-		Emails: []*Email{
-			CreateEmail(newUser.Email),
-		},
-	}
 }
 
 func (u *User) UpdateUserProfileFromModel(user *model.User) {

@@ -15,7 +15,6 @@ import (
 )
 
 type NewUser struct {
-
 	Name string `json:"name,omitempty"`
 
 	Username string `json:"username"`
@@ -23,6 +22,8 @@ type NewUser struct {
 	Email string `json:"email"`
 
 	Password string `json:"password"`
+
+	InviteCode string `json:"invite_code"`
 }
 
 func DecodeRequestToNewUser(r *http.Request) *NewUser {

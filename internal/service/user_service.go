@@ -83,7 +83,13 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 }
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
+	invite, err := s.inviteRepository.FindOneByCode(newUser.InviteCode)
+	if err != nil || invite.Claimed == true {
+		log.Print("error finding unclaimed invite :: ", err)
+		return nil, err
+	}
 	user := mapper.MapNewUserModelToEntity(newUser)
+	user.InviteID = invite.ID
 	result := s.userRepository.Create(user)
 	if result.Error != nil {
 		log.Print("error creating user record :: ", result.Error)
@@ -99,6 +105,8 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		s.userRepository.Delete(user)
 		return nil, err
 	}
+	invite.Claimed = true
+	s.inviteRepository.Save(invite)
 	user.CognitoId = uuid.MustParse(*response.UserSub)
 	result = s.userRepository.Save(user)
 	if result.Error != nil {
