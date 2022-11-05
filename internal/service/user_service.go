@@ -76,22 +76,30 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	user := mapper.MapNewUserModelToEntity(newUser)
-	s.userRepository.Create(user)
+	result := s.userRepository.Create(user)
+	if result.Error != nil {
+		log.Print("error creating user record :: ", result.Error)
+		return nil, result.Error
+	}
 	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
 		Username: aws.String(newUser.Email),
 		Password: aws.String(newUser.Password),
 		ClientId: aws.String(s.cognitoClientID),
 	})
 	if err != nil {
+		log.Print("error creating cognito user :: ", err)
 		s.userRepository.Delete(user)
 		return nil, err
 	}
 	user.CognitoId = uuid.MustParse(*response.UserSub)
-	s.userRepository.Save(user)
+	result = s.userRepository.Save(user)
+	if result.Error != nil {
+		log.Print("error updating user with cognito ID :: ", result.Error)
+	}
 	userModel := mapper.MapUserEntityToModel(user)
 	err = s.publishUserToKafka(user)
 	if err != nil {
-		log.Print(err)
+		log.Print("error publishing to kafka :: ", err)
 	}
 	return userModel, nil
 }

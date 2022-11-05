@@ -51,14 +51,14 @@ func (r *UserRepository) GetUserFromSessionToken(token string) (*entity.User, er
 	return user, nil
 }
 
-func (r *UserRepository) Create(user *entity.User) {
-	r.conn.Create(user)
+func (r *UserRepository) Create(user *entity.User) *gorm.DB {
+	return r.conn.Create(user)
 }
 
-func (r *UserRepository) Delete(user *entity.User) {
-	r.conn.Delete(user)
+func (r *UserRepository) Delete(user *entity.User) *gorm.DB {
+	return r.conn.Delete(user)
 }
 
-func (r *UserRepository) Save(user *entity.User) {
-	r.conn.Save(user)
+func (r *UserRepository) Save(user *entity.User) *gorm.DB {
+	return r.conn.Save(user)
 }

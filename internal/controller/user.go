@@ -17,7 +17,6 @@ func CreateNewUserV1(w http.ResponseWriter, r *http.Request) {
 	user, err := service.CreateDefaultUserService().CreateUser(newUserModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		log.Print(err)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
