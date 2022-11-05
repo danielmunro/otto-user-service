@@ -79,6 +79,13 @@ var routes = Routes{
 	},
 
 	{
+		"CreateInviteV1",
+		strings.ToUpper("Post"),
+		"/invite",
+		controller.CreateInviteV1,
+	},
+
+	{
 		"CreateNewUser",
 		strings.ToUpper("Post"),
 		"/user",

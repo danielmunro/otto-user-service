@@ -28,6 +28,7 @@ type UserService struct {
 	cognito             *cognitoidentityprovider.CognitoIdentityProvider
 	awsRegion           string
 	userRepository      *repository.UserRepository
+	inviteRepository    *repository.InviteRepository
 	kafkaWriter         *kafka.Producer
 }
 
@@ -39,10 +40,16 @@ const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.js
 func CreateDefaultUserService() *UserService {
 	return CreateUserService(
 		repository.CreateUserRepository(db.CreateDefaultConnection()),
-		kafka2.CreateWriter())
+		repository.CreateInviteRepository(db.CreateDefaultConnection()),
+		kafka2.CreateWriter(),
+	)
 }
 
-func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *kafka.Producer) *UserService {
+func CreateUserService(
+	userRepository *repository.UserRepository,
+	inviteRepository *repository.InviteRepository,
+	kafkaWriter *kafka.Producer,
+) *UserService {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -54,6 +61,7 @@ func CreateUserService(userRepository *repository.UserRepository, kafkaWriter *k
 		cognitoClientSecret: os.Getenv("COGNITO_CLIENT_SECRET"),
 		awsRegion:           os.Getenv("AWS_REGION"),
 		userRepository:      userRepository,
+		inviteRepository:    inviteRepository,
 		kafkaWriter:         kafkaWriter,
 	}
 }
@@ -319,6 +327,25 @@ func (s *UserService) ConfirmForgotPassword(otp *model.Otp) error {
 		log.Print("err with forgot password :: ", err.Error())
 	}
 	return err
+}
+
+func (s *UserService) GetInvite(code string) (*model.Invite, error) {
+	invite, err := s.inviteRepository.FindOneByCode(code)
+	if err != nil {
+		return nil, err
+	}
+	return mapper.MapInviteEntityToModel(invite), nil
+}
+
+func (s *UserService) CreateInviteFromCode(code string) (*model.Invite, error) {
+	invite := &entity.Invite{
+		Code: code,
+	}
+	result := s.inviteRepository.Create(invite)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return mapper.MapInviteEntityToModel(invite), nil
 }
 
 func (s *UserService) publishUserToKafka(userEntity *entity.User) error {

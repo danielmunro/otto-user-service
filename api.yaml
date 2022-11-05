@@ -165,6 +165,17 @@ paths:
       responses:
         '200':
           description: 200 submitted
+  /invite:
+    post:
+      operationId: createInviteV1
+      summary: create an invite
+      responses:
+        '201':
+          description: 201 response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invite"
   /group:
     get:
       operationId: getGroupV1
@@ -435,6 +446,13 @@ components:
         - token
       properties:
         token:
+          type: string
+    Invite:
+      type: object
+      required:
+        - code
+      properties:
+        code:
           type: string
     Role:
       type: string
