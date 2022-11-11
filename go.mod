@@ -1,6 +1,6 @@
 module github.com/danielmunro/otto-user-service
 
-go 1.17
+go 1.19
 
 require (
 	github.com/aws/aws-sdk-go v1.25.21
