@@ -84,7 +84,8 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 }
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
-	if minSize, digit, special, lower, upper := util.ValidatePassword(newUser.Password); minSize == digit == special == lower == upper != true {
+	minSize, digit, special, lower, upper := util.ValidatePassword(newUser.Password)
+	if !minSize || !digit || !special || !lower || !upper {
 		log.Print("cannot create user, invalid password")
 		msg := ""
 		if !minSize {
