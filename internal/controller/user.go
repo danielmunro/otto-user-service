@@ -6,6 +6,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/repository"
 	"github.com/danielmunro/otto-user-service/internal/service"
+	"github.com/danielmunro/otto-user-service/internal/util"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -17,6 +18,11 @@ func CreateNewUserV1(w http.ResponseWriter, r *http.Request) {
 	user, err := service.CreateDefaultUserService().CreateUser(newUserModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		if _, ok := err.(*util.InputFieldError); ok {
+			data, _ := json.Marshal(err)
+			_, _ = w.Write(data)
+			return
+		}
 		_, _ = w.Write([]byte(err.Error()))
 		return
 	}

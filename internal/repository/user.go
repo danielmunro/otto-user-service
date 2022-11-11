@@ -56,7 +56,7 @@ func (r *UserRepository) Create(user *entity.User) *gorm.DB {
 }
 
 func (r *UserRepository) Delete(user *entity.User) *gorm.DB {
-	return r.conn.Delete(user)
+	return r.conn.Unscoped().Delete(user)
 }
 
 func (r *UserRepository) Save(user *entity.User) *gorm.DB {

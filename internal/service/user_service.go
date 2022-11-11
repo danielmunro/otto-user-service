@@ -14,6 +14,7 @@ import (
 	"github.com/danielmunro/otto-user-service/internal/mapper"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/repository"
+	"github.com/danielmunro/otto-user-service/internal/util"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -83,14 +84,43 @@ func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, er
 }
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
+	if minSize, digit, special, lower, upper := util.ValidatePassword(newUser.Password); minSize == digit == special == lower == upper != true {
+		log.Print("cannot create user, invalid password")
+		msg := ""
+		if !minSize {
+			msg += "password is too short<br />"
+		}
+		if !digit {
+			msg += "password needs at least one digit<br />"
+		}
+		if !special {
+			msg += "password needs at least one special character<br />"
+		}
+		if !lower {
+			msg += "password needs at least one lower case letter<br />"
+		}
+		if !upper {
+			msg += "password needs at least one upper case letter<br />"
+		}
+		return nil, util.NewInputFieldError(
+			"password",
+			msg,
+		)
+	}
 	invite, err := s.inviteRepository.FindOneByCode(newUser.InviteCode)
 	if err != nil {
 		log.Print("error finding invite :: ", err)
-		return nil, errors.New("invite not found")
+		return nil, util.NewInputFieldError(
+			"inviteCode",
+			"invite code not found",
+		)
 	}
 	if invite.Claimed {
 		log.Print("attempting to use a claimed invite :: ", newUser.Email, newUser.InviteCode)
-		return nil, errors.New("attempting to use a claimed invite code")
+		return nil, util.NewInputFieldError(
+			"inviteCode",
+			"there was a problem with your invite code",
+		)
 	}
 	user := mapper.MapNewUserModelToEntity(newUser)
 	user.InviteID = invite.ID
@@ -99,11 +129,17 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		log.Print("error creating user record :: ", result.Error)
 		_, err = s.userRepository.GetUserFromUsername(newUser.Username)
 		if err != nil {
-			return nil, errors.New("username already in use")
+			return nil, util.NewInputFieldError(
+				"username",
+				"username already in use",
+			)
 		}
 		_, err = s.userRepository.GetUserFromEmail(newUser.Email)
 		if err != nil {
-			return nil, errors.New("email already registered, try logging in")
+			return nil, util.NewInputFieldError(
+				"email",
+				"email already registered, try logging in",
+			)
 		}
 		return nil, errors.New("error creating user")
 	}
