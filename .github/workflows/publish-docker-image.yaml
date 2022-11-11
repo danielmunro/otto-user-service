@@ -9,8 +9,8 @@ jobs:
       packages: write
       contents: read
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout
+      - uses: actions/setup-go
       - run: go vet ./...
       - run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u danielmunro --password-stdin
       - run: docker build -t ghcr.io/danielmunro/otto-user-service:${{ github.ref_name }} .
