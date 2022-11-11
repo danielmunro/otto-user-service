@@ -97,6 +97,14 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	result := s.userRepository.Create(user)
 	if result.Error != nil {
 		log.Print("error creating user record :: ", result.Error)
+		_, err = s.userRepository.GetUserFromUsername(newUser.Username)
+		if err != nil {
+			return nil, errors.New("username already in use")
+		}
+		_, err = s.userRepository.GetUserFromEmail(newUser.Email)
+		if err != nil {
+			return nil, errors.New("email already registered, try logging in")
+		}
 		return nil, errors.New("error creating user")
 	}
 	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
