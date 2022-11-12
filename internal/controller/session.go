@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/service"
-	"github.com/danielmunro/otto-user-service/internal/util"
 	"log"
 	"net/http"
 )
@@ -15,12 +14,8 @@ func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 	result, err := service.CreateDefaultUserService().CreateSession(newSessionModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		if _, ok := err.(*util.InputFieldError); ok {
-			data, _ := json.Marshal(err)
-			_, _ = w.Write(data)
-			return
-		}
-		_, _ = w.Write([]byte(err.Error()))
+		data, _ := json.Marshal(err)
+		_, _ = w.Write(data)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
