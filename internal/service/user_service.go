@@ -181,7 +181,26 @@ func (s *UserService) UpdateUser(userModel *model.User) error {
 	return nil
 }
 
-func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse {
+func (s *UserService) CreateSession(newSession *model.NewSession) (*AuthResponse, error) {
+	if newSession.Email == "" {
+		return nil, util.NewInputFieldError(
+			"email",
+			"email address is required",
+		)
+	}
+	if newSession.Password == "" {
+		return nil, util.NewInputFieldError(
+			"password",
+			"password is required",
+		)
+	}
+	search, _ := s.userRepository.GetUserFromEmail(newSession.Email)
+	if search == nil {
+		return nil, util.NewInputFieldError(
+			"email",
+			"email not found, do you need to sign up?",
+		)
+	}
 	response, err := s.cognito.InitiateAuth(&cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String(UserPasswordAuth),
 		AuthParameters: map[string]*string{
@@ -193,23 +212,21 @@ func (s *UserService) CreateSession(newSession *model.NewSession) *AuthResponse 
 
 	if err != nil {
 		log.Print("login failed", err.Error())
-		return createAuthFailedSessionResponse("auth failed")
-	}
-
-	user, err := s.userRepository.GetUserFromEmail(newSession.Email)
-	if err != nil {
-		return createAuthFailedSessionResponse("user not found")
+		return nil, util.NewInputFieldError(
+			"password",
+			"login failed, do you need a password reset?",
+		)
 	}
 
 	if response.AuthenticationResult != nil {
-		log.Print("updating user tokens with response from AWS for user ID: ", user.ID, ", response: ", response.String())
-		s.updateUserTokens(user, response.AuthenticationResult)
-		return createSessionResponse(user, response)
+		log.Print("updating user tokens with response from AWS for user ID: ", search.ID, ", response: ", response.String())
+		s.updateUserTokens(search, response.AuthenticationResult)
+		return createSessionResponse(search, response), nil
 	}
 
-	s.updateUserWithCreateSessionResult(user, response)
+	s.updateUserWithCreateSessionResult(search, response)
 	log.Print("created session from AWS: ", response.String())
-	return createChallengeSessionResponse(user, response)
+	return createChallengeSessionResponse(search, response), nil
 }
 
 func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordReset) *AuthResponse {

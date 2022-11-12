@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/danielmunro/otto-user-service/internal/model"
 	"github.com/danielmunro/otto-user-service/internal/service"
+	"github.com/danielmunro/otto-user-service/internal/util"
 	"log"
 	"net/http"
 )
@@ -11,9 +12,15 @@ import (
 // CreateSessionV1 - Create a new session
 func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 	newSessionModel := model.DecodeRequestToNewSession(r)
-	result := service.CreateDefaultUserService().CreateSession(newSessionModel)
-	if result.Token == nil {
-		w.WriteHeader(http.StatusForbidden)
+	result, err := service.CreateDefaultUserService().CreateSession(newSessionModel)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		if _, ok := err.(*util.InputFieldError); ok {
+			data, _ := json.Marshal(err)
+			_, _ = w.Write(data)
+			return
+		}
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
