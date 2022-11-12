@@ -60,7 +60,7 @@ func Test_CreateFirstSession_WillReceiveChallenge(t *testing.T) {
 		Email:    email,
 		Password: dummyPassword,
 	})
-	response := svc.CreateSession(&model.NewSession{
+	response, _ := svc.CreateSession(&model.NewSession{
 		Email:    email,
 		Password: dummyPassword,
 	})
