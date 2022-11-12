@@ -20,6 +20,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	"log"
 	"os"
+	"strings"
 )
 
 type UserService struct {
@@ -87,25 +88,26 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	minSize, digit, special, lower, upper := util.ValidatePassword(newUser.Password)
 	if !minSize || !digit || !special || !lower || !upper {
 		log.Print("cannot create user, invalid password")
-		msg := ""
+		msg := "passwords: "
+		var errs []string
 		if !minSize {
-			msg += "password is too short<br />"
+			errs = append(errs, "must be at least 8 characters")
 		}
 		if !digit {
-			msg += "password needs at least one digit<br />"
+			errs = append(errs, "need at least one digit")
 		}
 		if !special {
-			msg += "password needs at least one special character<br />"
+			errs = append(errs, "need at least one special character")
 		}
 		if !lower {
-			msg += "password needs at least one lower case letter<br />"
+			errs = append(errs, "need at least one lower case letter")
 		}
 		if !upper {
-			msg += "password needs at least one upper case letter<br />"
+			errs = append(errs, "need at least one upper case letter")
 		}
 		return nil, util.NewInputFieldError(
 			"password",
-			msg,
+			msg+strings.Join(errs, ", "),
 		)
 	}
 	invite, err := s.inviteRepository.FindOneByCode(newUser.InviteCode)
@@ -127,16 +129,15 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 	user.InviteID = invite.ID
 	result := s.userRepository.Create(user)
 	if result.Error != nil {
-		log.Print("error creating user record :: ", result.Error)
-		_, err = s.userRepository.GetUserFromUsername(newUser.Username)
-		if err != nil {
+		search, _ := s.userRepository.GetUserFromUsername(newUser.Username)
+		if search != nil {
 			return nil, util.NewInputFieldError(
 				"username",
 				"username already in use",
 			)
 		}
-		_, err = s.userRepository.GetUserFromEmail(newUser.Email)
-		if err != nil {
+		search, _ = s.userRepository.GetUserFromEmail(newUser.Email)
+		if search != nil {
 			return nil, util.NewInputFieldError(
 				"email",
 				"email already registered, try logging in",
