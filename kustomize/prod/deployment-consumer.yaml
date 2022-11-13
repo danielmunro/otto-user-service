@@ -29,13 +29,6 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
-          resources:
-            limits:
-              cpu: 250m
-              memory: 256Mi
-            requests:
-              cpu: 100m
-              memory: 64Mi
           env:
             - name: POSTGRES_HOST
               valueFrom:
