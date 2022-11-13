@@ -17,7 +17,7 @@ const (
 type AuthResponse struct {
 	AuthResponse AuthResponseType
 	Token        *string
-	User         *model.PublicUser
+	User         *model.User
 	Message      string
 }
 

@@ -50,7 +50,11 @@ func GetUserByUsernameV1(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUserV1 - Update a user
 func UpdateUserV1(w http.ResponseWriter, r *http.Request) {
-	userModel := model.DecodeRequestToUser(r)
+	userModel, err := model.DecodeRequestToUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	userService := service.CreateDefaultUserService()
 	sessionToken := getSessionToken(r)
 	sessionModel := &model.SessionToken{
@@ -150,9 +154,13 @@ func SubmitOTPV1(w http.ResponseWriter, r *http.Request) {
 
 // SubmitForgotPasswordV1 - Submit a forgot password request
 func SubmitForgotPasswordV1(w http.ResponseWriter, r *http.Request) {
-	userModel := model.DecodeRequestToUser(r)
+	userModel, err := model.DecodeRequestToUser(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	userService := service.CreateDefaultUserService()
-	err := userService.ForgotPassword(userModel)
+	err = userService.ForgotPassword(userModel)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}

@@ -25,7 +25,11 @@ func CreateSessionV1(w http.ResponseWriter, r *http.Request) {
 
 // RespondToChallengeV1 - Respond to an authentication challenge with a password reset
 func RespondToChallengeV1(w http.ResponseWriter, r *http.Request) {
-	passwordResetModel := model.DecodeRequestToPasswordReset(r)
+	passwordResetModel, err := model.DecodeRequestToPasswordReset(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	result := service.CreateDefaultUserService().ProvideChallengeResponse(passwordResetModel)
 	data, _ := json.Marshal(result)
 	_, _ = w.Write(data)

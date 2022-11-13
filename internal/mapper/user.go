@@ -7,26 +7,26 @@ import (
 
 func MapUserEntityToModel(user *entity.User) *model.User {
 	return &model.User{
-		Uuid:            user.Uuid.String(),
-		Name:            user.Name,
-		Username:        user.Username,
-		CurrentEmail:    user.CurrentEmail,
-		CurrentPassword: user.CurrentPassword,
-		ProfilePic:      user.ProfilePic,
-		Role:            model.Role(user.Role),
-		IsBanned:        user.IsBanned,
-		AddressCity:     user.AddressCity,
-		AddressStreet:   user.AddressStreet,
-		AddressZip:      user.AddressZip,
-		BioMessage:      user.BioMessage,
-		Birthday:        user.Birthday,
-		CreatedAt:       user.CreatedAt,
-		UpdatedAt:       user.UpdatedAt,
+		Uuid:          user.Uuid.String(),
+		Name:          user.Name,
+		Username:      user.Username,
+		Email:         user.CurrentEmail,
+		Password:      user.CurrentPassword,
+		ProfilePic:    user.ProfilePic,
+		Role:          model.Role(user.Role),
+		IsBanned:      user.IsBanned,
+		AddressCity:   user.AddressCity,
+		AddressStreet: user.AddressStreet,
+		AddressZip:    user.AddressZip,
+		BioMessage:    user.BioMessage,
+		Birthday:      user.Birthday,
+		CreatedAt:     user.CreatedAt,
+		UpdatedAt:     user.UpdatedAt,
 	}
 }
 
-func MapUserEntityToPublicUser(user *entity.User) *model.PublicUser {
-	return &model.PublicUser{
+func MapUserEntityToUser(user *entity.User) *model.User {
+	return &model.User{
 		Uuid:          user.Uuid.String(),
 		Name:          user.Name,
 		Username:      user.Username,

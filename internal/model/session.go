@@ -11,11 +11,11 @@ package model
 
 // Session struct for Session
 type Session struct {
-	User  *PublicUser `json:"user"`
-	Token string       `json:"token,omitempty"`
+	User  *User  `json:"user"`
+	Token string `json:"token,omitempty"`
 }
 
-func CreateSession(user *PublicUser, token string) *Session {
+func CreateSession(user *User, token string) *Session {
 	return &Session{
 		User:  user,
 		Token: token,

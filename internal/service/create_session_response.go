@@ -19,7 +19,7 @@ func getAuthResponseFromChallenge(response string) AuthResponseType {
 func createSessionResponse(user *entity.User, response *cognitoidentityprovider.InitiateAuthOutput) *AuthResponse {
 	return &AuthResponse{
 		Token: response.AuthenticationResult.AccessToken,
-		User:  mapper.MapUserEntityToPublicUser(user),
+		User:  mapper.MapUserEntityToUser(user),
 	}
 }
 
@@ -27,7 +27,7 @@ func createChallengeSessionResponse(user *entity.User, response *cognitoidentity
 	return &AuthResponse{
 		AuthResponse: getAuthResponseFromChallenge(*response.ChallengeName),
 		Token:        response.Session,
-		User:         mapper.MapUserEntityToPublicUser(user),
+		User:         mapper.MapUserEntityToUser(user),
 	}
 }
 

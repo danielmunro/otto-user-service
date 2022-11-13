@@ -14,18 +14,17 @@ import (
 	"net/http"
 )
 
-// Session struct for Session
 type PasswordReset struct {
-	Email string
+	Email    string
 	Password string
 }
 
-func DecodeRequestToPasswordReset(r *http.Request) *PasswordReset {
+func DecodeRequestToPasswordReset(r *http.Request) (*PasswordReset, error) {
 	decoder := json.NewDecoder(r.Body)
 	var data *PasswordReset
 	err := decoder.Decode(&data)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return data
+	return data, nil
 }

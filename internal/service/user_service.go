@@ -68,20 +68,20 @@ func CreateUserService(
 	}
 }
 
-func (s *UserService) GetUserFromUsername(username string) (*model.PublicUser, error) {
+func (s *UserService) GetUserFromUsername(username string) (*model.User, error) {
 	userEntity, err := s.userRepository.GetUserFromUsername(username)
 	if err != nil {
 		return nil, err
 	}
-	return mapper.MapUserEntityToPublicUser(userEntity), nil
+	return mapper.MapUserEntityToUser(userEntity), nil
 }
 
-func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.PublicUser, error) {
+func (s *UserService) GetUserFromUuid(userUuid uuid.UUID) (*model.User, error) {
 	userEntity, err := s.userRepository.GetUserFromUuid(userUuid)
 	if err != nil {
 		return nil, err
 	}
-	return mapper.MapUserEntityToPublicUser(userEntity), nil
+	return mapper.MapUserEntityToUser(userEntity), nil
 }
 
 func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
@@ -303,7 +303,7 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 		log.Print("user does not match jwt: ", response.String(), " and user: ", user)
 		return nil, errors.New("user does not match jwt")
 	}
-	return model.CreateSession(mapper.MapUserEntityToPublicUser(user), sessionToken.Token), nil
+	return model.CreateSession(mapper.MapUserEntityToUser(user), sessionToken.Token), nil
 }
 
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {
@@ -394,7 +394,7 @@ func (s *UserService) ForgotPassword(user *model.User) error {
 func (s *UserService) ConfirmForgotPassword(otp *model.Otp) error {
 	_, err := s.cognito.ConfirmForgotPassword(&cognitoidentityprovider.ConfirmForgotPasswordInput{
 		Username:         aws.String(otp.User.Username),
-		Password:         aws.String(otp.User.CurrentPassword),
+		Password:         aws.String(otp.User.Password),
 		ClientId:         aws.String(s.cognitoClientID),
 		ConfirmationCode: aws.String(otp.Code),
 	})

@@ -26,9 +26,9 @@ type User struct {
 
 	BioMessage string `json:"bio_message,omitempty"`
 
-	CurrentEmail string `json:"current_email,omitempty"`
+	Email string `json:"email,omitempty"`
 
-	CurrentPassword string `json:"current_password,omitempty"`
+	Password string `json:"password,omitempty"`
 
 	Role Role `json:"role,omitempty"`
 
@@ -45,18 +45,14 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-
-	Emails []Email `json:"emails,omitempty"`
-
-	Passwords []Password `json:"passwords,omitempty"`
 }
 
-func DecodeRequestToUser(r *http.Request) *User {
+func DecodeRequestToUser(r *http.Request) (*User, error) {
 	decoder := json.NewDecoder(r.Body)
 	var data *User
 	err := decoder.Decode(&data)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return data
+	return data, nil
 }
