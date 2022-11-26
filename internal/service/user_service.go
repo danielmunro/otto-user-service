@@ -1,9 +1,6 @@
 package service
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -148,12 +145,10 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		}
 		return nil, errors.New("error creating user")
 	}
-	secret := s.computeSecretHash(newUser.Email)
 	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
-		Username:   aws.String(newUser.Email),
-		Password:   aws.String(newUser.Password),
-		ClientId:   aws.String(s.cognitoClientID),
-		SecretHash: aws.String(secret),
+		Username: aws.String(newUser.Email),
+		Password: aws.String(newUser.Password),
+		ClientId: aws.String(s.cognitoClientID),
 	})
 	if err != nil {
 		log.Print("error creating cognito user :: ", err)
@@ -206,13 +201,11 @@ func (s *UserService) CreateSession(newSession *model.NewSession) (*AuthResponse
 			"email not found, do you need to sign up?",
 		)
 	}
-	secret := s.computeSecretHash(newSession.Email)
 	response, err := s.cognito.InitiateAuth(&cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String(UserPasswordAuth),
 		AuthParameters: map[string]*string{
-			"USERNAME":    aws.String(newSession.Email),
-			"PASSWORD":    aws.String(newSession.Password),
-			"SECRET_HASH": aws.String(secret),
+			"USERNAME": aws.String(newSession.Email),
+			"PASSWORD": aws.String(newSession.Password),
 		},
 		ClientId: aws.String(s.cognitoClientID),
 	})
@@ -239,18 +232,19 @@ func (s *UserService) CreateSession(newSession *model.NewSession) (*AuthResponse
 func (s *UserService) ProvideChallengeResponse(passwordReset *model.PasswordReset) *AuthResponse {
 	log.Print("provide challenge response :: ", passwordReset)
 	user, err := s.userRepository.GetUserFromEmail(passwordReset.Email)
+
 	if err != nil {
 		log.Print("user not found")
 		return createAuthFailedSessionResponse("user not found")
 	}
+
 	log.Print("requesting reset with: ", passwordReset.Email, ", session: ", user.LastSessionToken)
-	secret := s.computeSecretHash(passwordReset.Email)
+
 	data := &cognitoidentityprovider.RespondToAuthChallengeInput{
 		ChallengeName: aws.String(AuthResponseChallenge),
 		ChallengeResponses: map[string]*string{
 			"USERNAME":     aws.String(passwordReset.Email),
 			"NEW_PASSWORD": aws.String(passwordReset.Password),
-			"SECRET_HASH":  aws.String(secret),
 		},
 		ClientId: aws.String(s.cognitoClientID),
 		Session:  aws.String(user.LastSessionToken),
@@ -315,14 +309,17 @@ func (s *UserService) GetSession(sessionToken *model.SessionToken) (*model.Sessi
 func (s *UserService) RefreshSession(sessionRefresh *model.SessionRefresh) *AuthResponse {
 	log.Print("request refresh session :: ", sessionRefresh.Token)
 	user, err := s.userRepository.GetUserFromSessionToken(sessionRefresh.Token)
+
 	if err != nil {
 		log.Print("error finding user :: ", err)
 		return createAuthFailedSessionResponse("auth failed")
 	}
+
 	if user.LastRefreshToken == "" {
 		log.Print("no available refresh tokens")
 		return createAuthFailedSessionResponse("no available refresh tokens")
 	}
+
 	result, err := s.cognito.InitiateAuth(&cognitoidentityprovider.InitiateAuthInput{
 		AuthFlow: aws.String(AuthFlowRefreshToken),
 		AuthParameters: map[string]*string{
@@ -372,12 +369,10 @@ func (s *UserService) UnbanUser(sessionUser *entity.User, userEntity *entity.Use
 }
 
 func (s *UserService) SubmitOTP(otp *model.Otp) error {
-	secret := s.computeSecretHash(otp.User.Username)
 	_, err := s.cognito.ConfirmSignUp(&cognitoidentityprovider.ConfirmSignUpInput{
 		ConfirmationCode: aws.String(otp.Code),
 		Username:         aws.String(otp.User.Username),
 		ClientId:         aws.String(s.cognitoClientID),
-		SecretHash:       aws.String(secret),
 	})
 	if err != nil {
 		log.Print("err with OTP :: ", err.Error())
@@ -386,11 +381,9 @@ func (s *UserService) SubmitOTP(otp *model.Otp) error {
 }
 
 func (s *UserService) ForgotPassword(user *model.User) error {
-	secret := s.computeSecretHash(user.Email)
 	_, err := s.cognito.ForgotPassword(&cognitoidentityprovider.ForgotPasswordInput{
-		Username:   aws.String(user.Username),
-		ClientId:   aws.String(s.cognitoClientID),
-		SecretHash: aws.String(secret),
+		Username: aws.String(user.Username),
+		ClientId: aws.String(s.cognitoClientID),
 	})
 	if err != nil {
 		log.Print("err with forgot password :: ", err.Error())
@@ -399,13 +392,11 @@ func (s *UserService) ForgotPassword(user *model.User) error {
 }
 
 func (s *UserService) ConfirmForgotPassword(otp *model.Otp) error {
-	secret := s.computeSecretHash(otp.User.Username)
 	_, err := s.cognito.ConfirmForgotPassword(&cognitoidentityprovider.ConfirmForgotPasswordInput{
 		Username:         aws.String(otp.User.Username),
 		Password:         aws.String(otp.User.Password),
 		ClientId:         aws.String(s.cognitoClientID),
 		ConfirmationCode: aws.String(otp.Code),
-		SecretHash:       aws.String(secret),
 	})
 	if err != nil {
 		log.Print("err with forgot password :: ", err.Error())
@@ -480,11 +471,4 @@ func (s *UserService) updateUserTokens(user *entity.User, result *cognitoidentit
 		user.LastRefreshToken = *result.RefreshToken
 	}
 	s.userRepository.Save(user)
-}
-
-func (s *UserService) computeSecretHash(username string) string {
-	mac := hmac.New(sha256.New, []byte(s.cognitoClientSecret))
-	mac.Write([]byte(username + s.cognitoClientID))
-
-	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
