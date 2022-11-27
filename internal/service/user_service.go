@@ -40,9 +40,10 @@ const AuthResponseChallenge = "NEW_PASSWORD_REQUIRED"
 const JwkTokenUrl = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
 
 func CreateDefaultUserService() *UserService {
+	conn := db.CreateDefaultConnection()
 	return CreateUserService(
-		repository.CreateUserRepository(db.CreateDefaultConnection()),
-		repository.CreateInviteRepository(db.CreateDefaultConnection()),
+		repository.CreateUserRepository(conn),
+		repository.CreateInviteRepository(conn),
 		kafka2.CreateWriter(),
 	)
 }
@@ -145,11 +146,12 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		}
 		return nil, errors.New("error creating user")
 	}
-	response, err := s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
-		Username: aws.String(newUser.Email),
-		Password: aws.String(newUser.Password),
-		ClientId: aws.String(s.cognitoClientID),
-	})
+	userEntity, err := s.userRepository.GetUserFromUsername(newUser.Username)
+	if err != nil {
+		log.Print("user not found :: ", err)
+		return nil, err
+	}
+	response, err := s.PublishToCognito(userEntity, newUser.Password)
 	if err != nil {
 		log.Print("error creating cognito user :: ", err)
 		s.userRepository.Delete(user)
@@ -168,6 +170,14 @@ func (s *UserService) CreateUser(newUser *model.NewUser) (*model.User, error) {
 		log.Print("error publishing to kafka :: ", err)
 	}
 	return userModel, nil
+}
+
+func (s *UserService) PublishToCognito(user *entity.User, password string) (*cognitoidentityprovider.SignUpOutput, error) {
+	return s.cognito.SignUp(&cognitoidentityprovider.SignUpInput{
+		Username: aws.String(user.CurrentEmail),
+		Password: aws.String(password),
+		ClientId: aws.String(s.cognitoClientID),
+	})
 }
 
 func (s *UserService) UpdateUser(userModel *model.User) error {

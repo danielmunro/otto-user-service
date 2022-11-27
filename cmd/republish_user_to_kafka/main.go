@@ -7,6 +7,7 @@ import (
 	kafka2 "github.com/danielmunro/otto-user-service/internal/kafka"
 	"github.com/danielmunro/otto-user-service/internal/mapper"
 	"github.com/danielmunro/otto-user-service/internal/repository"
+	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
 	"log"
 	"os"
@@ -14,6 +15,10 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	username := os.Args[1]
 	kafkaWriter := kafka2.CreateWriter()
 	userRepository := repository.CreateUserRepository(db.CreateDefaultConnection())
